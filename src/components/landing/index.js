@@ -5,6 +5,7 @@ export { default as Stats } from "./Stats";
 export { default as Features } from "./Features";
 export { default as HowItWorks } from "./HowItWorks";
 export { default as PhoneDemo } from "./PhoneDemo";
+export { default as PayPalCheckoutDialog } from "./PayPalCheckoutDialog";
 export { default as Industries } from "./Industries";
 export { default as ReportIncludes } from "./ReportIncludes";
 export { default as Testimonials } from "./Testimonials";

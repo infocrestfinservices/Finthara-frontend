@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, X, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { PLANS } from "./landingData";
 import { getPaymentConfig, payForPlan, subscribeToPlan, previewCoupon, isLoggedIn } from "@/api/paymentService";
+import { getPayPalConfig } from "@/api/paypalService";
+import PayPalCheckoutDialog from "./PayPalCheckoutDialog";
 import { Input } from "@/components/ui/input";
 import { Tag, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,6 +22,8 @@ export default function Pricing({ showHeader = true }) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [payments, setPayments] = useState({ enabled: false });
+  const [paypal, setPaypal] = useState({ enabled: false });
+  const [paypalPlan, setPaypalPlan] = useState(null); // {id, name} of the plan the PayPal dialog is open for
   const [busy, setBusy] = useState("");
   // One code for the whole page rather than one per card: a customer has a code, not a code
   // per plan, and the server refuses it on any plan it does not apply to anyway.
@@ -47,8 +51,16 @@ export default function Pricing({ showHeader = true }) {
   useEffect(() => {
     let cancelled = false;
     getPaymentConfig().then((c) => !cancelled && setPayments(c || { enabled: false }));
+    getPayPalConfig().then((c) => !cancelled && setPaypal(c || { enabled: false }));
     return () => { cancelled = true; };
   }, []);
+
+  const paypalSuccess = (plan, result) => {
+    setPaypalPlan(null);
+    if (result.status === "paid") {
+      toast({ title: "Payment received", description: `You are on the ${plan.name} plan.` });
+    }
+  };
 
   const buy = async (plan) => {
     const id = PLAN_IDS[plan.name];
@@ -194,6 +206,26 @@ export default function Pricing({ showHeader = true }) {
                       </Button>
                     </Link>
                   )}
+
+                  {/* A second gateway for a buyer who'd rather pay in USD — Starter and the
+                      monthly plans, same as Razorpay above; Enterprise stays a conversation. */}
+                  {paypal.enabled && PLAN_IDS[plan.name] && plan.name !== "Enterprise" && (
+                    <button
+                      type="button"
+                      className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2.5 underline underline-offset-2"
+                      onClick={() => {
+                        if (!isLoggedIn()) {
+                          toast({ title: "Please sign in first",
+                                 description: "A plan is attached to your account, so we need you signed in." });
+                          navigate("/login");
+                          return;
+                        }
+                        setPaypalPlan({ id: PLAN_IDS[plan.name], name: plan.name });
+                      }}
+                    >
+                      or pay with PayPal
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -233,6 +265,16 @@ export default function Pricing({ showHeader = true }) {
           🔒 Secure payments · <Link to="/refund-policy" className="underline hover:text-foreground">7-day money-back guarantee</Link> · Invoice on every plan
         </p>
       </div>
+
+      {paypalPlan && (
+        <PayPalCheckoutDialog
+          open={Boolean(paypalPlan)}
+          onOpenChange={(v) => !v && setPaypalPlan(null)}
+          planId={paypalPlan.id}
+          planName={paypalPlan.name}
+          onSuccess={(result) => paypalSuccess(paypalPlan, result)}
+        />
+      )}
     </section>
   );
 }
