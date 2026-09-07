@@ -25,19 +25,25 @@ import {
 } from "@/components/ui/select";
 import {
   Users, CreditCard, FileText, ArrowLeft, Loader2, AlertCircle, Search, Tag, Plus,
-  LayoutDashboard, Crown, LogOut, RefreshCw, ShieldCheck, Repeat,
+  LayoutDashboard, Crown, LogOut, RefreshCw, ShieldCheck, Repeat, Receipt,
+  ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
 } from "lucide-react";
 import DashboardTab from "@/components/admin/DashboardTab";
 import RolesTab from "@/components/admin/RolesTab";
 import {
   getStats, getIndustries, getUsers, getPayments, getProjects, setUserPlan,
-  getCoupons, createCoupon, setCouponActive, getRepeatBuyers,
+  getCoupons, createCoupon, setCouponActive, getRepeatBuyers, getAdminInvoices,
 } from "@/api/adminService";
 
 const PLANS = ["free", "starter", "professional", "enterprise"];
 
 const money = (n) =>
   `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+
+// Invoices can now be in more than one currency (PayPal pays in USD) — this formats whatever
+// currency the invoice actually carries instead of assuming INR the way money() above does.
+const moneyIn = (n, currency) =>
+  `${currency || "INR"} ${Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const when = (iso) =>
   iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -224,6 +230,7 @@ export default function Admin() {
           {section === "overview" ? <DashboardTab /> : null}
           {section === "users" ? <UsersTab toast={toast} /> : null}
           {section === "payments" ? <PaymentsTab /> : null}
+          {section === "invoices" ? <InvoicesTab /> : null}
           {section === "projects" ? <ProjectsTab industries={industries} /> : null}
           {section === "coupons" ? <CouponsTab toast={toast} /> : null}
           {section === "roles" ? <RolesTab toast={toast} /> : null}
@@ -240,6 +247,8 @@ const SECTIONS = [
     hint: "Accounts, plans and report allowances" },
   { id: "payments", label: "Payments", icon: CreditCard,
     hint: "Every order, finished or not" },
+  { id: "invoices", label: "Invoices", icon: Receipt,
+    hint: "Every paid invoice, grouped by buyer" },
   { id: "projects", label: "Projects", icon: FileText,
     hint: "What has been created and whether it generated" },
   { id: "coupons", label: "Coupons", icon: Tag,
@@ -559,6 +568,158 @@ function PaymentsTab() {
             </tr>
           ))}
         </Table>
+      )}
+    </>
+  );
+}
+
+/** Every paid invoice, grouped by buyer — a customer's whole payment history in one card
+ *  instead of scattered through a flat list ordered by date. */
+function InvoicesTab() {
+  const [data, setData] = useState(null);
+  const [q, setQ] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [page, setPage] = useState(0);
+  const [expanded, setExpanded] = useState(() => new Set());
+  const LIMIT = 25;
+
+  const load = useCallback(async (p = page) => {
+    setData(null);
+    try {
+      const d = await getAdminInvoices({
+        q: q || undefined,
+        date_from: dateFrom ? new Date(dateFrom).toISOString() : undefined,
+        date_to: dateTo ? new Date(dateTo).toISOString() : undefined,
+        limit: LIMIT, offset: p * LIMIT,
+      });
+      setData(d);
+    } catch {
+      setData({ buyers: [], buyer_count: 0, invoice_count: 0, currency_totals: {} });
+    }
+  }, [q, dateFrom, dateTo, page]);   // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { load(0); setPage(0); }, []);   // eslint-disable-line react-hooks/exhaustive-deps
+
+  const search = () => { setPage(0); load(0); };
+  const toggle = (uid) => setExpanded((prev) => {
+    const next = new Set(prev);
+    next.has(uid) ? next.delete(uid) : next.add(uid);
+    return next;
+  });
+
+  const totalPages = data ? Math.max(1, Math.ceil(data.buyer_count / LIMIT)) : 1;
+
+  return (
+    <>
+      {data ? (
+        <div className="mb-4 flex flex-wrap gap-3">
+          <div className="rounded-lg border border-border bg-card px-4 py-2.5">
+            <div className="text-lg font-semibold">{data.buyer_count}</div>
+            <div className="text-xs text-muted-foreground">buyers</div>
+          </div>
+          <div className="rounded-lg border border-border bg-card px-4 py-2.5">
+            <div className="text-lg font-semibold">{data.invoice_count}</div>
+            <div className="text-xs text-muted-foreground">invoices</div>
+          </div>
+          {Object.entries(data.currency_totals || {}).map(([ccy, total]) => (
+            <div key={ccy} className="rounded-lg border border-border bg-card px-4 py-2.5">
+              <div className="text-lg font-semibold">{moneyIn(total, ccy)}</div>
+              <div className="text-xs text-muted-foreground">collected ({ccy})</div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <form className="mb-4 flex flex-wrap items-end gap-2"
+            onSubmit={(e) => { e.preventDefault(); search(); }}>
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+          <Input className="pl-9" placeholder="Invoice #, email or payment reference…"
+                 value={q} onChange={(e) => setQ(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">From</Label>
+          <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">To</Label>
+          <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+        </div>
+        <Button type="submit" variant="outline">Search</Button>
+      </form>
+
+      {data === null ? <Loading /> : data.buyers.length === 0 ? (
+        <Empty>No invoices found.</Empty>
+      ) : (
+        <>
+          <div className="space-y-3">
+            {data.buyers.map((b) => {
+              const open = expanded.has(b.user_id);
+              return (
+                <div key={b.user_id} className="rounded-lg border border-border bg-card">
+                  <button
+                    type="button"
+                    onClick={() => toggle(b.user_id)}
+                    className="flex w-full flex-wrap items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/40"
+                  >
+                    <div>
+                      <div className="font-medium text-foreground">{b.email}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {b.name || "—"} · {b.invoices.length} invoice{b.invoices.length === 1 ? "" : "s"}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {Object.entries(b.total_paid).map(([ccy, total]) => (
+                        <span key={ccy} className="text-sm font-medium text-foreground">
+                          {moneyIn(total, ccy)}
+                        </span>
+                      ))}
+                      {open ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                    </div>
+                  </button>
+
+                  {open ? (
+                    <div className="border-t border-border">
+                      <Table head={["Invoice", "Date", "Item", "List", "Discount", "Paid", "Method", "Reference"]}>
+                        {b.invoices.map((inv) => (
+                          <tr key={inv.id} className="hover:bg-muted/40">
+                            <td className="px-4 py-3 font-mono text-xs text-foreground">{inv.invoice_number}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{when(inv.issued_at)}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{inv.description}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{moneyIn(inv.list_amount, inv.currency)}</td>
+                            <td className="px-4 py-3 text-muted-foreground">
+                              {inv.discount ? moneyIn(inv.discount, inv.currency) : "—"}
+                              {inv.coupon_code ? <div className="text-xs">{inv.coupon_code}</div> : null}
+                            </td>
+                            <td className="px-4 py-3 font-medium text-foreground">{moneyIn(inv.paid_amount, inv.currency)}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{inv.payment_method}</td>
+                            <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{inv.payment_reference}</td>
+                          </tr>
+                        ))}
+                      </Table>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+            <span>Page {page + 1} of {totalPages}</span>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" disabled={page === 0}
+                      onClick={() => { const p = page - 1; setPage(p); load(p); }}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button size="sm" variant="outline" disabled={page + 1 >= totalPages}
+                      onClick={() => { const p = page + 1; setPage(p); load(p); }}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </>
       )}
     </>
   );

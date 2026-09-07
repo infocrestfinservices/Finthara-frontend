@@ -76,6 +76,7 @@ export async function setCouponActive(id, active) {
 }
 
 export const getDashboard = (days = 90) => get("/dashboard", { days });
+export const getAdminInvoices = (params) => get("/invoices", params);
 
 export const getRoles = () => get("/roles");
 export const getRepeatBuyers = () => get("/repeat-buyers");
