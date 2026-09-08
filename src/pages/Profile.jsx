@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  User, CreditCard, FileText, Receipt, Settings as SettingsIcon, Loader2, Camera,
+  User, Users, CreditCard, FileText, Receipt, Settings as SettingsIcon, Loader2, Camera,
   Mail, CheckCircle2, Pencil, Shield, ShieldCheck, ShieldOff, Sun, Moon, Monitor,
   LogOut, Trash2, Search, Plus, ExternalLink, Copy, Check, KeyRound,
 } from "lucide-react";
@@ -31,6 +31,7 @@ import { profileService } from "@/api/profileService";
 import { getMyPlan } from "@/api/paymentService";
 import { reportStorage } from "@/api/localStorageService";
 import ReportCard from "@/components/report/ReportCard";
+import TeamTab from "@/components/profile/TeamTab";
 
 const day = (iso) =>
   iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -89,6 +90,9 @@ export default function Profile() {
               <TabsTrigger value="billing" className="gap-1.5 text-xs sm:text-sm py-2 shrink-0 whitespace-nowrap">
                 <Receipt className="w-3.5 h-3.5" /> Billing
               </TabsTrigger>
+              <TabsTrigger value="team" className="gap-1.5 text-xs sm:text-sm py-2 shrink-0 whitespace-nowrap">
+                <Users className="w-3.5 h-3.5" /> Team
+              </TabsTrigger>
               <TabsTrigger value="settings" className="gap-1.5 text-xs sm:text-sm py-2 shrink-0 whitespace-nowrap">
                 <SettingsIcon className="w-3.5 h-3.5" /> Settings
               </TabsTrigger>
@@ -110,6 +114,9 @@ export default function Profile() {
             </TabsContent>
             <TabsContent value="billing" className="mt-6">
               <BillingTab />
+            </TabsContent>
+            <TabsContent value="team" className="mt-6">
+              <TeamTab />
             </TabsContent>
             <TabsContent value="settings" className="mt-6">
               <SettingsTab profile={profile} onChange={refresh} logout={logout} />

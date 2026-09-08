@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,12 @@ import PasswordInput from "@/components/PasswordInput";
 export default function Login() {
   const { login, completeTwoFactorLogin } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  // Where to land after login. Only an in-app relative path is honoured, so this can't be
+  // turned into an open redirect.
+  const nextParam = params.get("next") || "";
+  const afterLogin = nextParam.startsWith("/") && !nextParam.startsWith("//")
+    ? nextParam : "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +32,7 @@ export default function Login() {
     setLoading(true);
     try {
       await completeTwoFactorLogin(challenge, code);
-      window.location.href = "/dashboard";
+      window.location.href = afterLogin;
     } catch (err) {
       setError(err.message || "Invalid code");
     } finally {
@@ -88,7 +94,7 @@ export default function Login() {
         setLoading(false);
         return;
       }
-      window.location.href = "/dashboard";
+      window.location.href = afterLogin;
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes("verify your email")) {
         setError(

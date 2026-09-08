@@ -12,6 +12,7 @@ import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import AcceptInvite from '@/pages/AcceptInvite';
 import Home from '@/pages/Home';
 import FeaturesPage from '@/pages/Features';
 import HowItWorksPage from '@/pages/HowItWorks';
@@ -51,6 +52,9 @@ const AuthenticatedApp = () => {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      {/* Public on purpose: an invited person may not be signed in yet. The page itself
+          handles the signed-out case. */}
+      <Route path="/accept-invite" element={<AcceptInvite />} />
 
       {/* Public marketing pages */}
       <Route path="/" element={<Home />} />
