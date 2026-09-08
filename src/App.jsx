@@ -13,6 +13,7 @@ import VerifyEmail from '@/pages/VerifyEmail';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import AcceptInvite from '@/pages/AcceptInvite';
+import Contact from '@/pages/Contact';
 import Home from '@/pages/Home';
 import FeaturesPage from '@/pages/Features';
 import HowItWorksPage from '@/pages/HowItWorks';
@@ -64,6 +65,7 @@ const AuthenticatedApp = () => {
       {/* Public and unauthenticated on purpose: Razorpay checks this page before
           issuing live keys, and a customer must be able to read it before paying. */}
       <Route path="/refund-policy" element={<RefundPolicy />} />
+      <Route path="/contact" element={<Contact />} />
 
       {/* Authenticated app pages */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>

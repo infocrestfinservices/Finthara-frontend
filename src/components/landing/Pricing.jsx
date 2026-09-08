@@ -199,7 +199,7 @@ export default function Pricing({ showHeader = true }) {
                         : <>{plan.cta}{popular && <ArrowRight className="w-4 h-4" />}</>}
                     </Button>
                   ) : (
-                    <Link to={plan.name === "Enterprise" ? "/contact" : "/create"}>
+                    <Link to={plan.name === "Enterprise" ? "/contact?topic=enterprise" : "/create"}>
                       <Button variant={plan.variant} className="w-full gap-1.5" size="lg">
                         {plan.cta}
                         {popular && <ArrowRight className="w-4 h-4" />}
