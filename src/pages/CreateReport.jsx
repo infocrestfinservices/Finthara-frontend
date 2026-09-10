@@ -479,6 +479,9 @@ export default function CreateReport() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStep, setGeneratingStep] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  // The real step the backend job reports (via generateModel's onProgress). When set it
+  // replaces the timed guesswork line; empty falls back to the rotating GENERATION_STEPS.
+  const [backendStage, setBackendStage] = useState("");
   const [collectedData, setCollectedData] = useState(null);
   // After the chat is "ready", we pause to let the user review the chosen
   // template's financial inputs before generating.
@@ -597,6 +600,7 @@ export default function CreateReport() {
   const generateReport = async (data, cellAnswers = {}, templateId = null) => {
     setIsGenerating(true);
     setGeneratingStep(0);
+    setBackendStage("");
     try {
       const purposeLabels = {
         bank_loan: "Bank Loan / Term Loan",
@@ -666,7 +670,9 @@ export default function CreateReport() {
         await generateModel(
           saved.id,
           { ...(data.purpose_answers || {}), ...cellAnswers },
-          templateId
+          templateId,
+          false, undefined, false,
+          (pct, stage) => { if (stage) setBackendStage(stage); },
         );
 
         clearTimers();
@@ -875,9 +881,11 @@ export default function CreateReport() {
                     {OVEN[generatingStep % OVEN.length]}
                   </span>
                   <span>
-                    {generatingStep < GENERATION_STEPS.length
-                      ? GENERATION_STEPS[generatingStep]
-                      : HOLDING_LINES[(generatingStep - GENERATION_STEPS.length) % HOLDING_LINES.length]}
+                    {backendStage
+                      ? `${backendStage}…`
+                      : generatingStep < GENERATION_STEPS.length
+                        ? GENERATION_STEPS[generatingStep]
+                        : HOLDING_LINES[(generatingStep - GENERATION_STEPS.length) % HOLDING_LINES.length]}
                   </span>
                 </div>
 

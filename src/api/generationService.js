@@ -19,10 +19,20 @@ function authHeaders(json = true) {
   return h;
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Start a report generation and wait for it to finish.
+ *
+ * Generation is a 1-3 minute pipeline. It used to run inside this one HTTP request, which
+ * the hosting platform kills at ~60s — so a report that was still building came back as a
+ * 504 "failed". Now the POST only starts a background job and returns a job id; we poll
+ * GET /generate/jobs/{id} until it's done. `onProgress(pct, stage)` fires on each poll.
+ */
 export async function generateModel(projectId, purposeAnswers = {}, templateId = null,
                                     refreshInputs = false, instructions = undefined,
-                                    withWordReport = false) {
-  const res = await fetch(`${BACKEND_URL}/generate/${projectId}`, {
+                                    withWordReport = false, onProgress = null) {
+  const startRes = await fetch(`${BACKEND_URL}/generate/${projectId}`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({
@@ -40,9 +50,53 @@ export async function generateModel(projectId, purposeAnswers = {}, templateId =
       ...(instructions !== undefined ? { instructions } : {}),
     }),
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw planAwareError(res, data, `Generation failed (${res.status})`);
-  return data;
+  const start = await startRes.json().catch(() => ({}));
+  // A plan limit (402) is refused here, before any job is created.
+  if (!startRes.ok) throw planAwareError(startRes, start, `Generation failed (${startRes.status})`);
+
+  const jobId = start.job_id;
+  if (!jobId) {
+    // Backend not yet on the async build — the old shape (the result inline). Use it as-is.
+    return start;
+  }
+
+  // Poll. ~2.5s between checks; give up after ~10 minutes (the server fails a job that
+  // outlives its own limit, so this is just a backstop against a hung poll).
+  const deadline = Date.now() + 10 * 60 * 1000;
+  while (Date.now() < deadline) {
+    await sleep(2500);
+    let job;
+    try {
+      const r = await fetch(`${BACKEND_URL}/generate/jobs/${jobId}`, { headers: authHeaders(false) });
+      job = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        // A transient network/proxy blip on a poll — keep trying rather than failing the
+        // whole generation for it.
+        if (r.status >= 500 || r.status === 429) continue;
+        throw planAwareError(r, job, `Generation failed (${r.status})`);
+      }
+    } catch (e) {
+      if (e.status) throw e;         // a real HTTP error surfaced above
+      continue;                      // fetch threw (offline etc.) — retry
+    }
+
+    if (onProgress && typeof job.progress === "number") {
+      onProgress(job.progress, job.stage || "");
+    }
+    if (job.status === "done") {
+      if (onProgress) onProgress(100, "Done");
+      return job.result || {};
+    }
+    if (job.status === "failed") {
+      const err = new Error(job.error || "Report generation failed. Please try again.");
+      // The server phrases a plan-limit failure the same way the 402 does; flag it so the
+      // UI shows the upgrade path instead of "please try again".
+      err.needsUpgrade = /plan|upgrade|covers \d+ report/i.test(job.error || "");
+      throw err;
+    }
+  }
+  throw new Error("Report generation is taking longer than expected. It may still finish — "
+                + "check your reports in a few minutes.");
 }
 
 // The inputs this project's model was built from, labelled — shown for review before a
