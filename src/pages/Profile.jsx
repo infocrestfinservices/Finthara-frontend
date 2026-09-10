@@ -24,7 +24,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   User, Users, CreditCard, FileText, Receipt, Settings as SettingsIcon, Loader2, Camera,
   Mail, CheckCircle2, Pencil, Shield, ShieldCheck, ShieldOff, Sun, Moon, Monitor,
-  LogOut, Trash2, Search, Plus, ExternalLink, Copy, Check, KeyRound,
+  LogOut, Trash2, Search, Plus, ExternalLink, Copy, Check, KeyRound, LifeBuoy,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { profileService } from "@/api/profileService";
@@ -32,6 +32,7 @@ import { getMyPlan } from "@/api/paymentService";
 import { reportStorage } from "@/api/localStorageService";
 import ReportCard from "@/components/report/ReportCard";
 import TeamTab from "@/components/profile/TeamTab";
+import ContactForm from "@/components/ContactForm";
 
 const day = (iso) =>
   iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -580,6 +581,7 @@ function SettingsTab({ profile, onChange, logout }) {
       <NotificationsCard profile={profile} onChange={onChange} />
       <ThemeCard profile={profile} onChange={onChange} />
       <TwoFactorCard profile={profile} onChange={onChange} />
+      <HelpDeskCard profile={profile} />
       <div className="border rounded-xl p-5 flex items-center justify-between">
         <div>
           <p className="font-medium text-sm">Log out</p>
@@ -590,6 +592,27 @@ function SettingsTab({ profile, onChange, logout }) {
         </Button>
       </div>
       <DeleteAccountCard logout={logout} />
+    </div>
+  );
+}
+
+function HelpDeskCard({ profile }) {
+  return (
+    <div className="border rounded-xl p-5">
+      <div className="flex items-center gap-2 mb-1">
+        <LifeBuoy className="w-4 h-4 text-muted-foreground" />
+        <h3 className="font-semibold text-sm">Help desk</h3>
+      </div>
+      <p className="text-xs text-muted-foreground mb-4">
+        A question about your plan, a payment, your reports, or anything else — send it here
+        and we'll reply by email.
+      </p>
+      <ContactForm
+        defaultName={profile.full_name || ""}
+        defaultEmail={profile.email || ""}
+        defaultTopic="Technical support"
+        lockEmail
+      />
     </div>
   );
 }

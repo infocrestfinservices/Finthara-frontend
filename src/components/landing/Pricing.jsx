@@ -183,10 +183,10 @@ export default function Pricing({ showHeader = true }) {
 
                 {/* CTA */}
                 <div className="px-6 pb-6 mt-auto">
-                  {/* Enterprise is a conversation, not a checkout — and if the server has
-                      no keys the button stays a link rather than offering to take money
-                      that cannot be collected. */}
-                  {payments.enabled && PLAN_IDS[plan.name] && plan.name !== "Enterprise" ? (
+                  {/* Every named plan — Starter, Professional AND Enterprise — is a real
+                      checkout. If the server has no keys the button stays a link rather
+                      than offering to take money that cannot be collected. */}
+                  {payments.enabled && PLAN_IDS[plan.name] ? (
                     <Button
                       variant={plan.variant}
                       className="w-full gap-1.5"
@@ -199,7 +199,7 @@ export default function Pricing({ showHeader = true }) {
                         : <>{plan.cta}{popular && <ArrowRight className="w-4 h-4" />}</>}
                     </Button>
                   ) : (
-                    <Link to={plan.name === "Enterprise" ? "/contact?topic=enterprise" : "/create"}>
+                    <Link to="/create">
                       <Button variant={plan.variant} className="w-full gap-1.5" size="lg">
                         {plan.cta}
                         {popular && <ArrowRight className="w-4 h-4" />}
@@ -207,9 +207,9 @@ export default function Pricing({ showHeader = true }) {
                     </Link>
                   )}
 
-                  {/* A second gateway for a buyer who'd rather pay in USD — Starter and the
-                      monthly plans, same as Razorpay above; Enterprise stays a conversation. */}
-                  {paypal.enabled && PLAN_IDS[plan.name] && plan.name !== "Enterprise" && (
+                  {/* A second gateway for a buyer who'd rather pay in USD — all three plans,
+                      same as Razorpay above. */}
+                  {paypal.enabled && PLAN_IDS[plan.name] && (
                     <button
                       type="button"
                       className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-2.5 underline underline-offset-2"
