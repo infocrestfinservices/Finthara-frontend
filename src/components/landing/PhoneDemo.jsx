@@ -24,7 +24,7 @@ export default function PhoneDemo({ className = "" }) {
     <div className={`relative overflow-hidden phone-demo-box ${className}`}>
       <iframe
         src="/chatbot-demo.html"
-        title="ReportCraft chat demo"
+        title="Finthara chat demo"
         className="absolute top-0 left-0 w-[440px] h-[900px] border-0 phone-demo-frame"
         loading="lazy"
       />

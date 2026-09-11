@@ -125,7 +125,7 @@ export default function Login() {
     <AuthLayout
       icon={LogIn}
       title="Welcome back"
-      subtitle="Log in to your ReportCraft account"
+      subtitle="Log in to your Finthara account"
       footer={
         <>
           Don't have an account?{" "}

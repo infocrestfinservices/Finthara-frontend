@@ -43,7 +43,7 @@ export default function ReportIncludes() {
             to="/features"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:gap-2.5 transition-all"
           >
-            See everything ReportCraft produces <ArrowRight className="w-4 h-4" />
+            See everything Finthara produces <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

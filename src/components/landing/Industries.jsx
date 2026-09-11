@@ -14,7 +14,7 @@ export default function Industries() {
           One tool, nine industries, any business
         </h2>
         <p className="text-muted-foreground mt-3">
-          ReportCraft tailors every section, metric and assumption to your sector — so the report
+          Finthara tailors every section, metric and assumption to your sector — so the report
           reads like a domain expert prepared it.
         </p>
       </div>

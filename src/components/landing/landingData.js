@@ -9,7 +9,7 @@ export const FEATURES = [
   { icon: BarChart3, title: "Live Financial Charts", desc: "P&L, revenue projections, and cost breakdowns rendered as interactive graphs inside the report.", color: "text-emerald-500", bg: "bg-emerald-50" },
   { icon: Download, title: "Export Everywhere", desc: "Download as polished PDF, formatted Word doc, or editable Excel — ready to submit.", color: "text-amber-500", bg: "bg-amber-50" },
   { icon: Shield, title: "Bank & Investor Ready", desc: "DSCR, Current Ratio, IRR, Payback Period, MOIC — every metric lenders and investors need.", color: "text-rose-500", bg: "bg-rose-50" },
-  { icon: Clock, title: "Minutes, Not Weeks", desc: "What a CA takes 2–3 weeks to prepare, ReportCraft delivers in under 5 minutes.", color: "text-sky-600", bg: "bg-sky-50" },
+  { icon: Clock, title: "Minutes, Not Weeks", desc: "What a CA takes 2–3 weeks to prepare, Finthara delivers in under 5 minutes.", color: "text-sky-600", bg: "bg-sky-50" },
 ];
 
 export const STATS = [

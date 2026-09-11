@@ -22,7 +22,7 @@ export function exportToPDF(report, theme) {
   // Running page header (shows on every page after the cover)
   const pageHeaderHTML = report.logo_url
     ? `<div class="page-header"><img src="${report.logo_url}" alt="" style="height:28px; object-fit:contain;" /><span>${report.title}</span></div>`
-    : `<div class="page-header"><span style="font-weight:700;color:${primary}">${report.promoter_name || "ReportCraft AI"}</span><span>${report.title}</span></div>`;
+    : `<div class="page-header"><span style="font-weight:700;color:${primary}">${report.promoter_name || "Finthara AI"}</span><span>${report.title}</span></div>`;
 
   printWindow.document.write(`
     <!DOCTYPE html>

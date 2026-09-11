@@ -44,7 +44,7 @@ export default function RefundPolicy() {
 
         <Section title="What you are buying">
           <p>
-            ReportCraft AI generates financial project reports — a CMA-format Excel workbook
+            Finthara AI generates financial project reports — a CMA-format Excel workbook
             and a written Word/PDF report — from the details you provide. It is a digital
             service. A report is produced and made available to download as soon as it is
             generated, and there is nothing to ship or return.

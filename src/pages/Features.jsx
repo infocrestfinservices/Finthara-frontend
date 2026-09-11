@@ -117,7 +117,7 @@ export default function FeaturesPage() {
             <Sparkles className="w-3.5 h-3.5 text-primary" /> Platform features
           </span>
           <h1 className="text-4xl sm:text-5xl font-heading font-bold tracking-tight leading-[1.05] animate-fade-up animation-delay-200">
-            A closer look at how <span className="text-gradient">ReportCraft AI</span> works
+            A closer look at how <span className="text-gradient">Finthara AI</span> works
           </h1>
           <p className="text-muted-foreground mt-5 max-w-2xl mx-auto text-lg leading-relaxed animate-fade-up animation-delay-300">
             Not just another report builder. Explore the AI interview, bank-ready CMA
@@ -174,7 +174,7 @@ export default function FeaturesPage() {
               The difference
             </p>
             <h2 className="text-3xl sm:text-4xl font-heading font-bold tracking-tight">
-              ReportCraft AI vs the old way
+              Finthara AI vs the old way
             </h2>
           </Reveal>
 
@@ -185,7 +185,7 @@ export default function FeaturesPage() {
                   <th className="text-left font-medium text-muted-foreground px-5 py-4 w-[34%]"></th>
                   <th className="px-5 py-4">
                     <span className="inline-flex items-center gap-1.5 font-heading font-bold text-primary">
-                      <Sparkles className="w-4 h-4" /> ReportCraft AI
+                      <Sparkles className="w-4 h-4" /> Finthara AI
                     </span>
                   </th>
                   <th className="px-5 py-4 font-semibold text-foreground/70">Hiring a CA</th>

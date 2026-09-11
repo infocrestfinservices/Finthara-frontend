@@ -39,7 +39,7 @@ export default function ReportShowcase() {
                     <img
                       key={i}
                       src={src}
-                      alt="ReportCraft AI generated report"
+                      alt="Finthara AI generated report"
                       className="w-full rounded-lg border border-border shadow-md"
                       loading="lazy"
                     />

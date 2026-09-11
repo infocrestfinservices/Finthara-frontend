@@ -71,7 +71,7 @@ export default function LandingFooter() {
         </div>
 
         <div className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
-          <p>© 2026 ReportCraft AI. Built for Indian &amp; global entrepreneurs.</p>
+          <p>© 2026 Finthara AI. Built for Indian &amp; global entrepreneurs.</p>
           <p className="inline-flex items-center gap-1.5">
             <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
             All systems operational
