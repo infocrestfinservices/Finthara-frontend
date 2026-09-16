@@ -123,6 +123,14 @@ module.exports = {
   			'pulse-ring': {
   				'0%': { transform: 'scale(0.9)', opacity: '0.6' },
   				'80%, 100%': { transform: 'scale(1.6)', opacity: '0' }
+  			},
+  			'splash-pop': {
+  				'0%': { opacity: '0', transform: 'scale(0.82)' },
+  				'100%': { opacity: '1', transform: 'scale(1)' }
+  			},
+  			'splash-out': {
+  				'0%': { opacity: '1' },
+  				'100%': { opacity: '0' }
   			}
   		},
   		animation: {
@@ -136,7 +144,9 @@ module.exports = {
   			'marquee-vertical': 'marquee-vertical 36s linear infinite',
   			'grow-bar': 'grow-bar 0.9s cubic-bezier(0.16, 1, 0.3, 1) both',
   			'bar-wave': 'bar-wave 2.6s ease-in-out infinite',
-  			'pulse-ring': 'pulse-ring 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite'
+  			'pulse-ring': 'pulse-ring 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite',
+  			'splash-pop': 'splash-pop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both',
+  			'splash-out': 'splash-out 0.4s ease-in both'
   		}
   	}
   },

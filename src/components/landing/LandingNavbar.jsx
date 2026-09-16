@@ -41,21 +41,21 @@ export default function LandingNavbar() {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-3 min-h-24 flex items-center justify-between gap-4">
         <Link to="/" className="shrink-0">
-          <Logo size="md" subtitle="Bank & investor-ready reports" />
+          <Logo size="xl" subtitle="Bank & investor-ready reports" />
         </Link>
 
         {/* Center nav — absolutely centered on the header, independent of the logo/actions widths on either side */}
-        <nav className="hidden md:flex items-center gap-1.5 text-sm font-medium bg-muted/40 border border-border rounded-full p-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <nav className="hidden md:flex items-center gap-1.5 text-sm font-medium bg-slate-500/50 backdrop-blur-md border border-white/10 shadow-sm rounded-full p-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
               to={link.to}
               className={`px-4 py-1.5 rounded-full transition-colors ${
                 isActive(link.to)
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-white/15 text-white shadow-sm"
+                  : "text-white/75 hover:text-white"
               }`}
             >
               {link.label}
@@ -68,8 +68,8 @@ export default function LandingNavbar() {
               to="/profile"
               className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full transition-colors ${
                 isActive("/profile")
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-white/15 text-white shadow-sm"
+                  : "text-white/75 hover:text-white"
               }`}
             >
               <UserIcon className="w-3.5 h-3.5" /> Profile

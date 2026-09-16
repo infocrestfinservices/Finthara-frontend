@@ -35,7 +35,7 @@ import {
   getCoupons, createCoupon, setCouponActive, getRepeatBuyers, getAdminInvoices,
 } from "@/api/adminService";
 
-const PLANS = ["free", "starter", "professional", "enterprise"];
+const PLANS = ["free", "basic", "advanced"];
 
 const money = (n) =>
   `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -100,9 +100,8 @@ function Table({ head, children }) {
 function PlanBadge({ plan, lapsed }) {
   const styles = {
     free: "bg-muted text-muted-foreground",
-    starter: "bg-blue-500/15 text-blue-400",
-    professional: "bg-emerald-500/15 text-emerald-400",
-    enterprise: "bg-violet-500/15 text-violet-400",
+    basic: "bg-blue-500/15 text-blue-400",
+    advanced: "bg-violet-500/15 text-violet-400",
   };
   return (
     <span className="inline-flex items-center gap-1">
@@ -325,9 +324,8 @@ function MobileNav({ section, onSelect }) {
 const PLAN_FILTERS = [
   { id: "", label: "All" },
   { id: "free", label: "Free" },
-  { id: "starter", label: "Starter" },
-  { id: "professional", label: "Professional" },
-  { id: "enterprise", label: "Enterprise" },
+  { id: "basic", label: "Basic" },
+  { id: "advanced", label: "Advanced" },
 ];
 
 function UsersTab({ toast }) {
@@ -421,7 +419,7 @@ function UsersTab({ toast }) {
  *  goodwill extension, or a refund; the reason is recorded in the server log because there
  *  is no payment record to explain it later. */
 function PlanDialog({ user, onClose, onSaved }) {
-  const [plan, setPlan] = useState("professional");
+  const [plan, setPlan] = useState("basic");
   const [days, setDays] = useState("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
@@ -471,8 +469,8 @@ function PlanDialog({ user, onClose, onSaved }) {
               <Input type="number" placeholder="Leave blank for the plan's own period"
                      value={days} onChange={(e) => setDays(e.target.value)} />
               <p className="text-xs text-muted-foreground">
-                Blank uses the plan's normal period — 30 days for the monthly plans, no expiry
-                for Free and Starter. Enter 0 for no expiry.
+                Blank uses the plan's normal period — 30 days for Basic and Advanced, no expiry
+                for Free. Enter 0 for no expiry.
               </p>
             </div>
             <div className="space-y-2">
@@ -972,7 +970,7 @@ function NewCouponDialog({ open, onClose, onCreated }) {
 
           <div className="space-y-2">
             <Label>Applies to</Label>
-            <Input placeholder="Blank for all paid plans, or e.g. professional, enterprise"
+            <Input placeholder="Blank for all paid plans, or e.g. basic, advanced"
                    value={f.applies_to} onChange={set("applies_to")} />
           </div>
 

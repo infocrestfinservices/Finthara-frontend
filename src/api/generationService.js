@@ -132,7 +132,7 @@ export async function getTemplateSchema(purpose, templateId) {
  * An error that remembers WHY the server said no.
  *
  * The backend answers 402 when the request is perfectly valid and the caller simply is not
- * on a plan that covers it — a Word download on Free, or a fourth report on Starter. That
+ * on a plan that covers it — any generation or export attempted before subscribing. That
  * is not a failure to report as one: the user has done nothing wrong and there is an
  * obvious next step. Marking it here lets the screens show the plan message with a way to
  * act on it, instead of a red "download failed".

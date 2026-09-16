@@ -2,8 +2,8 @@
  * TeamTab.jsx — the "Team" tab inside Profile.jsx.
  *
  * Owner view  : invite people, set each member's role (viewer / editor), remove them,
- *               see pending invites and a short activity log. Gated to Professional /
- *               Enterprise (team_enabled from the backend); other plans see an upsell.
+ *               see pending invites and a short activity log. Gated to the Advanced plan
+ *               (team_enabled from the backend); Basic sees an upsell.
  * Member view : the teams this account belongs to, with the option to leave.
  *
  * "owner" is not an assignable role — it is the account holder. A member is viewer or
@@ -278,7 +278,7 @@ function UpsellCard({ planLabel }) {
         <div>
           <p className="font-semibold text-sm">Team seats</p>
           <p className="text-xs text-muted-foreground">
-            Invite colleagues to share your projects. Available on Professional and Enterprise
+            Invite colleagues to share your projects. Available on the Advanced plan
             {planLabel ? ` — you're on ${planLabel}.` : "."}
           </p>
         </div>

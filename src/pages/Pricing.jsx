@@ -20,7 +20,7 @@ export default function PricingPage() {
             Simple, transparent <span className="text-primary">pricing</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto leading-relaxed">
-            Start free and upgrade when you need more — or simply pay per report. No hidden fees.
+            Every feature, on both plans. Add a team when you need one. No hidden fees.
           </p>
         </div>
       </section>

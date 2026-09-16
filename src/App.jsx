@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import SplashScreen from '@/components/SplashScreen';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
@@ -93,6 +94,7 @@ function App() {
           <AuthenticatedApp />
         </Router>
         <Toaster />
+        <SplashScreen />
       </QueryClientProvider>
     </AuthProvider>
   )

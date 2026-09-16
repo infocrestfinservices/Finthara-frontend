@@ -285,8 +285,8 @@ export default function DashboardTab() {
                     emptying out never repaints the ones that remain. */}
                 {data.plans.map((p) => (
                   <Cell key={p.plan}
-                        fill={{ enterprise: "var(--s4)", professional: "var(--s3)",
-                                starter: "var(--s2)", free: "var(--s1)" }[p.plan] || "var(--s1)"} />
+                        fill={{ advanced: "var(--s3)",
+                                basic: "var(--s2)", free: "var(--s1)" }[p.plan] || "var(--s1)"} />
                 ))}
                 <LabelList dataKey="count" position="right"
                            style={{ fill: "var(--ink)", fontSize: 11 }} />

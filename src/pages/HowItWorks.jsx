@@ -79,7 +79,7 @@ export default function HowItWorksPage() {
             and downloading a bank-ready report.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm">
-            {["No credit card", "First report free", "Edit anytime"].map((t) => (
+            {["Unlimited reports", "All export formats", "Edit anytime"].map((t) => (
               <span key={t} className="inline-flex items-center gap-1.5 text-muted-foreground">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t}
               </span>

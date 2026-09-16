@@ -49,24 +49,17 @@ export default function RefundPolicy() {
             service. A report is produced and made available to download as soon as it is
             generated, and there is nothing to ship or return.
           </p>
-          <p>We offer four plans:</p>
+          <p>We offer two plans, both billed every 30 days:</p>
           <ul className="list-disc pl-6 space-y-1">
             <li>
-              <strong>Free</strong> — no payment. One report, PDF download.
+              <strong>Basic (₹1,999 / month)</strong> — unlimited reports with PDF, Word and
+              Excel downloads, for a single user.
             </li>
             <li>
-              <strong>Starter (₹499)</strong> — a one-time payment. Three reports, PDF
-              download. It does not renew and does not expire.
-            </li>
-            <li>
-              <strong>Professional (₹1,499 / month)</strong> and{" "}
-              <strong>Enterprise (₹4,999 / month)</strong> — billed every 30 days. Unlimited
-              reports with PDF, Word and Excel downloads.
+              <strong>Advanced (₹11,000 / month)</strong> — everything in Basic, plus a team
+              of 3 seats (one owner and two invited members, as an editor or a viewer).
             </li>
           </ul>
-          <p>
-            You can try the product on the Free plan without entering any payment details.
-          </p>
         </Section>
 
         <Section title="Refunds">
@@ -96,14 +89,14 @@ export default function RefundPolicy() {
 
         <Section title="Cancelling a monthly plan">
           <p>
-            You can cancel Professional or Enterprise at any time from your billing settings,
+            You can cancel Basic or Advanced at any time from your billing settings,
             or by writing to {SUPPORT}.
           </p>
           <p>
             <strong>Cancelling stops the next charge. It does not end your current month.</strong>{" "}
             You keep full access until the end of the period you have already paid for, and
-            your plan then drops to Free automatically. We do not take back access you have
-            paid for.
+            your plan then lapses automatically — new report generation and exports stop
+            until you subscribe again. We do not take back access you have paid for.
           </p>
           <p>
             We do not charge part-months. If you cancel on day 3 of a cycle, you keep the plan
@@ -115,9 +108,8 @@ export default function RefundPolicy() {
           <p>
             If a renewal payment fails, your card issuer is usually the reason and we will
             retry. Access continues until the end of the period you have already paid for. If
-            the payment still has not gone through by then, the account moves to the Free plan
-            — your projects and reports are not deleted, and paying again restores access to
-            them.
+            the payment still has not gone through by then, the plan lapses — your projects
+            and reports are not deleted, and paying again restores access to them.
           </p>
         </Section>
 

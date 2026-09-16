@@ -579,7 +579,7 @@ FORMATTING RULES:
                       key={c}
                       onClick={() => handleBrandColorChange(c)}
                       className="w-6 h-6 rounded-full border-2 transition-transform hover:scale-110"
-                      style={{ backgroundColor: c, borderColor: report.brand_color === c ? "#000" : "transparent" }}
+                      style={{ backgroundColor: c, borderColor: report.brand_color === c ? "#0f172a" : "transparent" }}
                       title={c}
                     />
                   ))}

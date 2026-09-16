@@ -20,7 +20,7 @@ import { Mail, Send, Loader2, CheckCircle2 } from "lucide-react";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 export const CONTACT_TOPICS = [
-  "Enterprise plan",
+  "Advanced plan",
   "Sales question",
   "Billing / payments",
   "Technical support",

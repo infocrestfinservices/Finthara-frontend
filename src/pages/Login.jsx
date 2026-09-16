@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import PasswordInput from "@/components/PasswordInput";
+import { markSplashForNextLoad } from "@/components/SplashScreen";
 
 export default function Login() {
   const { login, completeTwoFactorLogin } = useAuth();
@@ -32,6 +33,7 @@ export default function Login() {
     setLoading(true);
     try {
       await completeTwoFactorLogin(challenge, code);
+      markSplashForNextLoad();
       window.location.href = afterLogin;
     } catch (err) {
       setError(err.message || "Invalid code");
@@ -94,6 +96,7 @@ export default function Login() {
         setLoading(false);
         return;
       }
+      markSplashForNextLoad();
       window.location.href = afterLogin;
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes("verify your email")) {

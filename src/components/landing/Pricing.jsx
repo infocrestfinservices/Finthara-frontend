@@ -12,11 +12,11 @@ import { useToast } from "@/components/ui/use-toast";
 
 // The card's display name is what the server knows the plan by. Keep these in step: an
 // unknown id is refused by /payments/order rather than charged at some default.
-const PLAN_IDS = { Starter: "starter", Professional: "professional", Enterprise: "enterprise" };
+const PLAN_IDS = { Basic: "basic", Advanced: "advanced" };
 // Which plans are billed every month and so need a mandate rather than a one-off charge.
 // The server refuses /payments/subscribe for anything else, so this only decides which
 // checkout to open — it is not what enforces the rule.
-const RECURRING = new Set(["professional", "enterprise"]);
+const RECURRING = new Set(["basic", "advanced"]);
 
 export default function Pricing({ showHeader = true }) {
   const { toast } = useToast();
@@ -39,10 +39,10 @@ export default function Pricing({ showHeader = true }) {
       return;
     }
     setCheckingCoupon(true);
-    // Previewed against Professional, the plan the code is most likely meant for. It is
-    // re-checked against the ACTUAL plan when the order is created, so a code that only
-    // applies to Starter is still honoured there — this preview is a courtesy, not the rule.
-    setCouponState(await previewCoupon(code, "professional"));
+    // Previewed against Basic, the plan the code is most likely meant for. It is re-checked
+    // against the ACTUAL plan when the order is created, so a code that only applies to
+    // Advanced is still honoured there — this preview is a courtesy, not the rule.
+    setCouponState(await previewCoupon(code, "basic"));
     setCheckingCoupon(false);
   };
 
@@ -78,8 +78,8 @@ export default function Pricing({ showHeader = true }) {
     setBusy(id);
     try {
       // Monthly plans take a MANDATE, not a single charge. Charging them once was how
-      // "₹1,499 / month" became a one-off payment for a licence that never ended. Starter
-      // is genuinely one-time and keeps the Orders flow.
+      // "₹1,499 / month" became a one-off payment for a licence that never ended. Both
+      // plans are monthly now, so both go through the subscription flow below.
       const recurring = RECURRING.has(id);
       let result;
       let usedAutoPay = recurring;
@@ -135,12 +135,12 @@ export default function Pricing({ showHeader = true }) {
           <div className="text-center mb-12">
             <p className="text-primary text-sm font-semibold uppercase tracking-widest mb-2">Pricing</p>
             <h3 className="text-3xl sm:text-4xl font-heading font-bold">Plans for every need</h3>
-            <p className="text-muted-foreground mt-3">Start free. Upgrade when you need more. Cancel anytime.</p>
+            <p className="text-muted-foreground mt-3">Everything Finthara offers, on both plans. Add a team when you need one. Cancel anytime.</p>
           </div>
         )}
 
         {/* Subscription Plans */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start md:pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start md:pt-4 max-w-3xl mx-auto">
           {PLANS.map((plan) => {
             const popular = Boolean(plan.tag);
             return (
@@ -183,9 +183,9 @@ export default function Pricing({ showHeader = true }) {
 
                 {/* CTA */}
                 <div className="px-6 pb-6 mt-auto">
-                  {/* Every named plan — Starter, Professional AND Enterprise — is a real
-                      checkout. If the server has no keys the button stays a link rather
-                      than offering to take money that cannot be collected. */}
+                  {/* Every named plan — Basic AND Advanced — is a real checkout. If the
+                      server has no keys the button stays a link rather than offering to
+                      take money that cannot be collected. */}
                   {payments.enabled && PLAN_IDS[plan.name] ? (
                     <Button
                       variant={plan.variant}
@@ -207,7 +207,7 @@ export default function Pricing({ showHeader = true }) {
                     </Link>
                   )}
 
-                  {/* A second gateway for a buyer who'd rather pay in USD — all three plans,
+                  {/* A second gateway for a buyer who'd rather pay in USD — both plans,
                       same as Razorpay above. */}
                   {paypal.enabled && PLAN_IDS[plan.name] && (
                     <button

@@ -1,6 +1,6 @@
 import {
   Sparkles, Globe2, BarChart3, Download, Shield, Clock, Zap,
-  Building2, TrendingUp, Award, Calculator, ShieldCheck, FileText,
+  Calculator, ShieldCheck, FileText,
 } from "lucide-react";
 
 export const FEATURES = [
@@ -10,13 +10,6 @@ export const FEATURES = [
   { icon: Download, title: "Export Everywhere", desc: "Download as polished PDF, formatted Word doc, or editable Excel — ready to submit.", color: "text-amber-500", bg: "bg-amber-50" },
   { icon: Shield, title: "Bank & Investor Ready", desc: "DSCR, Current Ratio, IRR, Payback Period, MOIC — every metric lenders and investors need.", color: "text-rose-500", bg: "bg-rose-50" },
   { icon: Clock, title: "Minutes, Not Weeks", desc: "What a CA takes 2–3 weeks to prepare, Finthara delivers in under 5 minutes.", color: "text-sky-600", bg: "bg-sky-50" },
-];
-
-export const STATS = [
-  { value: "10,000+", label: "Reports Generated" },
-  { value: "₹2,400 Cr+", label: "Loans Facilitated" },
-  { value: "95%", label: "Approval Rate" },
-  { value: "4.9 ★", label: "User Rating" },
 ];
 
 // Bank / scheme / report formats the AI can produce — used in the marquee strip.
@@ -50,67 +43,41 @@ export const TESTIMONIALS = [
 
 export const PLANS = [
   {
-    name: "Starter",
+    name: "Basic",
     tag: null,
-    price: "₹499",
-    period: "one-time",
-    description: "Perfect for a single loan application or project proposal.",
+    price: "₹1,999",
+    period: "/ month",
+    description: "Everything Finthara offers, for a single user.",
     color: "border-border",
     headerBg: "bg-muted/40",
     features: [
-      { text: "3 Project Reports", included: true },
+      { text: "Unlimited Reports", included: true },
       { text: "Short & Long Format", included: true },
-      { text: "PDF Export", included: true },
-      { text: "Word Export", included: false },
-      { text: "Excel Financials", included: false },
-      { text: "CMA / SBA Formats", included: false },
-      { text: "Investor-Grade Metrics", included: false },
+      { text: "PDF + Word + Excel Export", included: true },
+      { text: "CMA / SBA / All Bank & Scheme Formats", included: true },
+      { text: "Investor-Grade Metrics", included: true },
+      { text: "Team Members", included: false },
     ],
-    cta: "Get Started",
+    cta: "Get Basic",
     variant: "outline",
   },
   {
-    name: "Professional",
-    tag: "Most Popular",
-    price: "₹1,499",
+    name: "Advanced",
+    tag: "Team Access",
+    price: "₹11,000",
     period: "/ month",
-    description: "For CAs, consultants, and entrepreneurs with ongoing needs.",
+    description: "Everything in Basic, plus a team: invite an editor and a viewer alongside you.",
     color: "border-primary",
     headerBg: "bg-primary",
     features: [
       { text: "Unlimited Reports", included: true },
       { text: "Short & Long Format", included: true },
-      { text: "PDF + Word Export", included: true },
-      { text: "Excel Financials Export", included: true },
-      { text: "CMA Modeling", included: true },
-      { text: "Team Members (3 seats)", included: true },
+      { text: "PDF + Word + Excel Export", included: true },
+      { text: "CMA / SBA / All Bank & Scheme Formats", included: true },
+      { text: "Investor-Grade Metrics", included: true },
+      { text: "Team Members (3 seats — Owner, Editor, Viewer)", included: true },
     ],
-    cta: "Get Professional",
+    cta: "Get Advanced",
     variant: "default",
   },
-  {
-    name: "Enterprise",
-    tag: null,
-    price: "₹4,999",
-    period: "/ month",
-    description: "For CA firms, DSAs, and banks processing high volumes.",
-    color: "border-border",
-    headerBg: "bg-muted/40",
-    features: [
-      { text: "Unlimited Reports", included: true },
-      { text: "All Export Formats", included: true },
-      { text: "CMA Modeling", included: true },
-      { text: "Team Members (10 seats)", included: true },
-      { text: "White-label & Custom Branding", included: true },
-    ],
-    cta: "Get Enterprise",
-    variant: "outline",
-  },
-];
-
-export const ONE_TIME = [
-  { name: "Single CMA Report", price: "₹299", desc: "One full CMA-format report for any Indian bank", icon: Building2 },
-  { name: "Investor Pitch Pack", price: "₹799", desc: "VC-grade financials + pitch deck summary", icon: TrendingUp },
-  { name: "Government Scheme Report", price: "₹199", desc: "PMEGP, Mudra, CGTMSE, or any state scheme", icon: Award },
-  { name: "Feasibility Study", price: "₹499", desc: "Technical + financial feasibility with SWOT", icon: BarChart3 },
 ];

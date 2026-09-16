@@ -13,7 +13,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 export default function Contact() {
   const [params] = useSearchParams();
-  const topic = params.get("topic") === "enterprise" ? "Enterprise plan" : "Sales question";
+  const topic = params.get("topic") === "advanced" ? "Advanced plan" : "Sales question";
   const [info, setInfo] = useState({ email: "support@infocrest.in", company: null, address: null });
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Contact() {
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-14">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Contact us</h1>
         <p className="text-muted-foreground mt-2">
-          Questions about a plan, Enterprise pricing, or anything else — send a message and
+          Questions about a plan, Advanced pricing, or anything else — send a message and
           we'll get back to you. You can also email{" "}
           <a href={`mailto:${info.email}`} className="text-primary underline">{info.email}</a>.
         </p>

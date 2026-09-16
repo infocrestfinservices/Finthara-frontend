@@ -65,7 +65,7 @@ export default function ReviewInputsModal({ projectId, onClose, onConfirm }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-4">
       <div className="bg-card rounded-xl shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
         <div className="flex items-start justify-between px-5 py-4 border-b">
           <div>
