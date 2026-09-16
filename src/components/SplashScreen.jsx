@@ -50,7 +50,7 @@ export default function SplashScreen() {
       <img
         src="/logo.png"
         alt="Finthara AI"
-        className="h-16 sm:h-20 w-auto animate-splash-pop"
+        className="h-28 sm:h-40 w-auto animate-splash-pop"
       />
     </div>
   );
