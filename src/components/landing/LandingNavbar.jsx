@@ -41,9 +41,9 @@ export default function LandingNavbar() {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-3 min-h-24 flex items-center justify-between gap-4">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 min-h-24 flex items-center justify-between gap-4">
         <Link to="/" className="shrink-0">
-          <Logo size="xl" subtitle="Bank & investor-ready reports" />
+          <Logo size="xl" />
         </Link>
 
         {/* Center nav — absolutely centered on the header, independent of the logo/actions widths on either side */}

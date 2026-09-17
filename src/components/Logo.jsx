@@ -16,7 +16,7 @@ const SIZES = {
   sm: { box: "w-8 h-8 rounded-lg", icon: "w-4 h-4", badge: "w-3.5 h-3.5", check: "w-2 h-2", title: "text-sm", img: "h-8" },
   md: { box: "w-9 h-9 rounded-xl", icon: "w-5 h-5", badge: "w-4 h-4", check: "w-2.5 h-2.5", title: "text-base", img: "h-9" },
   lg: { box: "w-14 h-14 rounded-2xl", icon: "w-7 h-7", badge: "w-5 h-5", check: "w-3 h-3", title: "text-2xl", img: "h-14" },
-  xl: { box: "w-16 h-16 rounded-2xl", icon: "w-8 h-8", badge: "w-5 h-5", check: "w-3 h-3", title: "text-3xl", img: "h-20" },
+  xl: { box: "w-16 h-16 rounded-2xl", icon: "w-8 h-8", badge: "w-5 h-5", check: "w-3 h-3", title: "text-3xl", img: "h-24" },
 };
 
 const SOURCES = ["/logo.svg", "/logo.png"];
