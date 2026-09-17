@@ -47,29 +47,29 @@ export default function LandingNavbar() {
         </Link>
 
         {/* Center nav — absolutely centered on the header, independent of the logo/actions widths on either side */}
-        <nav className="hidden md:flex items-center gap-1.5 text-sm font-medium bg-slate-500/50 backdrop-blur-md border border-white/10 shadow-sm rounded-full p-1 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <nav className="hidden md:flex items-center gap-2 text-sm font-medium absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className={`px-4 py-1.5 rounded-full transition-colors ${
+              className={`px-4 py-1.5 rounded-full border transition-colors ${
                 isActive(link.to)
-                  ? "bg-white/15 text-white shadow-sm"
-                  : "text-white/75 hover:text-white"
+                  ? "bg-primary text-white border-primary shadow-sm"
+                  : "bg-white text-primary border-primary/20 hover:bg-primary/10"
               }`}
             >
               {link.label}
             </Link>
           ))}
-          {/* In the same pill as Home/Features/… rather than off on its own — that's the
-              one place logged-in users look for it. */}
+          {/* Its own pill like every other item — that's the one place logged-in users
+              look for it. */}
           {user && (
             <Link
               to="/profile"
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border transition-colors ${
                 isActive("/profile")
-                  ? "bg-white/15 text-white shadow-sm"
-                  : "text-white/75 hover:text-white"
+                  ? "bg-primary text-white border-primary shadow-sm"
+                  : "bg-white text-primary border-primary/20 hover:bg-primary/10"
               }`}
             >
               <UserIcon className="w-3.5 h-3.5" /> Profile
