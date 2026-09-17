@@ -52,7 +52,7 @@ export default function LandingNavbar() {
             <Link
               key={link.to}
               to={link.to}
-              className={`px-4 py-1.5 rounded-full border transition-colors ${
+              className={`px-4 py-1.5 rounded-full border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
                 isActive(link.to)
                   ? "bg-primary text-white border-primary shadow-sm"
                   : "bg-white text-primary border-primary/20 hover:bg-primary/10"
@@ -66,7 +66,7 @@ export default function LandingNavbar() {
           {user && (
             <Link
               to="/profile"
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
                 isActive("/profile")
                   ? "bg-primary text-white border-primary shadow-sm"
                   : "bg-white text-primary border-primary/20 hover:bg-primary/10"
