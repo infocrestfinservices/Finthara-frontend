@@ -46,7 +46,7 @@ export default function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2">
             <Link to="/" className="inline-flex mb-4">
-              <Logo size="lg" />
+              <Logo size="xl" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               AI-powered feasibility studies and project reports — bank, scheme, and investor-ready
