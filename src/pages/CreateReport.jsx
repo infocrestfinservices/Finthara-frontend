@@ -37,10 +37,15 @@ STEP 2 — as soon as you have the target market, ask THIS, before any money que
 
 STEP 3 — now ask the money questions, and ask ONLY the set that matches their answer:
 
-   IF SHORT — three questions, nothing more. Do not ask for balance-sheet figures; the
+   IF SHORT — four questions, nothing more. Do not ask for balance-sheet figures; the
    short report does not use them and asking for them wastes the user's time:
      - roughly what the whole project would cost to set up (project_cost)
      - how much of that they want as a bank loan (loan_amount)
+     - how much of the REST they (the promoter) are putting in themselves — their own
+       contribution/equity, not the bank's money (own_contribution). MANDATORY: a bank
+       never finances 100% of a project, so this is never skipped and never defaulted to
+       0 on your own — if they genuinely have none to put in, that is their own answer,
+       not your assumption, so ask plainly rather than silently leaving it blank
      - which bank they are approaching (bank_name)
      Then go straight to the JSON block.
 
@@ -51,15 +56,32 @@ STEP 3 — now ask the money questions, and ask ONLY the set that matches their 
      - UK → "Is this for a specific bank product — e.g. **British Business Bank / CBILS**?"
      - elsewhere → "Any specific bank format, or is the standard format fine?"
      then these figures, ONE at a time, into "purpose_answers" under these exact keys:
-     loan_amount, existing_borrowings, working_capital_requirement, current_assets,
-     current_liabilities, projected_sales, projected_expenses, inventory, debtors,
-     creditors, bank_name
+     loan_amount, own_contribution, existing_borrowings, working_capital_requirement,
+     current_assets, current_liabilities, projected_sales, projected_expenses, inventory,
+     debtors, creditors, bank_name, ancillary_revenue
+
+     own_contribution (promoter's own equity/capital going into the project, separate
+     from the loan) is MANDATORY — never skip it and never default it to 0 without
+     asking. A term loan covering the entire project cost is not something a bank
+     approves, so this number matters as much as the loan amount itself.
+
+     ancillary_revenue is a single yes/no-then-detail question, asked once: "Besides
+     [the main product/service], does the business have any OTHER income — e.g.
+     by-product or scrap sales, job-work/contract work for others, trading of bought-out
+     goods, or other operating income? If yes, roughly how much per year; if no, just say
+     no." Store their answer as free text (including an explicit "no"/"none") — never
+     leave this key out of purpose_answers, and never invent a figure or a stream they
+     did not mention. An explicit "no" is exactly as valid an answer as a number.
 
 PURPOSE IS ALWAYS "bank_loan". Never ask what the report is for and never offer other
 purposes — every report this product makes is a bank submission. Set it silently.
 
 For numeric answers store plain numbers (no symbols or commas). If the user does not know a
 value, store null and move on — never block on a figure they have not worked out yet.
+own_contribution is the one exception to that: if they are unsure, ask them to estimate
+rather than accepting silence, since a project with no promoter stake at all is the kind
+of thing a bank flags immediately — if after being asked to estimate they still say they
+have none, THAT (an explicit 0) is a real answer and is fine to store as such.
 
 STEP 4 — once you have everything STEP 3 asked for (and nothing more), respond with ONLY
 this JSON block and no other text. For a SHORT report leave the balance-sheet keys out
