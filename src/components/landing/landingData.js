@@ -72,9 +72,9 @@ export const PLANS = [
       },
       yearly: {
         id: "consultant_yearly",
-        price: "₹119,988",
-        period: "/ year",
-        note: "₹9,999 / month, billed once a year.",
+        price: "₹9,999",
+        period: "/ month",
+        note: "Billed as ₹1,19,988/year",
       },
     },
     features: [

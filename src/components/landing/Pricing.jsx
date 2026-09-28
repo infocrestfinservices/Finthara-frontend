@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -174,11 +175,13 @@ export default function Pricing({ showHeader = true }) {
                     </div>
                   )}
                   <p className="text-sm font-semibold text-muted-foreground mb-2">{plan.name}</p>
-                  <div className="flex items-end gap-1.5">
-                    <span className="text-4xl font-heading font-bold">{option.price}</span>
-                    <span className="text-muted-foreground text-sm mb-1">{option.period}</span>
+                  <div key={option.id} className="animate-in fade-in duration-300">
+                    <div className="flex items-end gap-1.5">
+                      <span className="text-4xl font-heading font-bold">{option.price}</span>
+                      <span className="text-muted-foreground text-sm mb-1">{option.period}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1.5">{option.note}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1.5">{option.note}</p>
                   <p className="text-muted-foreground text-sm mt-3 leading-relaxed">{plan.description}</p>
                 </div>
 
@@ -238,32 +241,28 @@ export default function Pricing({ showHeader = true }) {
   );
 }
 
-/** Monthly | Yearly pill for the Consultant & CA card. */
+/** Monthly ⇄ Yearly switch for the Consultant & CA card. Yearly = ₹9,999 × 12 = ₹1,19,988
+ *  against ₹11,000 × 12 = ₹1,32,000 monthly: ₹12,012 a year saved, 9.1%. */
 function BillingToggle({ cycle, onChange }) {
+  const yearly = cycle === "yearly";
   return (
-    <div role="radiogroup" aria-label="Billing period"
-         className="inline-flex items-center gap-1 p-1 rounded-full border border-border/60 bg-background/60 backdrop-blur-md shadow-sm">
-      {[["monthly", "Monthly"], ["yearly", "Yearly"]].map(([key, label]) => (
-        <button
-          key={key}
-          type="button"
-          role="radio"
-          aria-checked={cycle === key}
-          onClick={() => onChange(key)}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            cycle === key
-              ? "bg-primary text-primary-foreground shadow"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {label}
-          {key === "yearly" && (
-            <span className={`ml-1.5 text-xs ${cycle === key ? "opacity-90" : "text-emerald-600"}`}>
-              Save ₹12,012
-            </span>
-          )}
-        </button>
-      ))}
+    <div className="flex items-center gap-2.5 text-sm">
+      <button type="button" onClick={() => onChange("monthly")}
+              className={`transition-colors ${!yearly ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+        Monthly
+      </button>
+      <Switch
+        checked={yearly}
+        onCheckedChange={(on) => onChange(on ? "yearly" : "monthly")}
+        aria-label="Bill yearly"
+      />
+      <button type="button" onClick={() => onChange("yearly")}
+              className={`transition-colors ${yearly ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+        Yearly
+      </button>
+      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+        Save 9%
+      </span>
     </div>
   );
 }
