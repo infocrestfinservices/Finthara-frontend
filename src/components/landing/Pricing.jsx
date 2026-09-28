@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +18,17 @@ import { useToast } from "@/components/ui/use-toast";
 const RECURRING = new Set(["consultant_monthly", "consultant_yearly"]);
 const CYCLE_WORD = { consultant_monthly: "month", consultant_yearly: "year" };
 
+/** The plan card + billing cycle that sells a given server plan id, or null. */
+function findOption(planId) {
+  for (const plan of PLANS) {
+    if (!plan.billing && plan.id === planId) return { cycle: null, option: plan };
+    for (const [cycle, b] of Object.entries(plan.billing || {})) {
+      if (b.id === planId) return { cycle, option: selected(plan, cycle) };
+    }
+  }
+  return null;
+}
+
 /** The option a card is currently selling: its server id, price and billing note. */
 function selected(plan, cycle) {
   if (!plan.billing) return plan;
@@ -27,6 +38,7 @@ function selected(plan, cycle) {
 export default function Pricing({ showHeader = true }) {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [payments, setPayments] = useState({ enabled: false });
   const [paypal, setPaypal] = useState({ enabled: false });
   const [cycle, setCycle] = useState("monthly");          // Consultant & CA billing
@@ -43,11 +55,27 @@ export default function Pricing({ showHeader = true }) {
     return () => { cancelled = true; };
   }, []);
 
+  // Coming back from login with ?plan=<id>: reopen the checkout for the plan that was
+  // picked, so the customer does not have to find it and click Get Plan a second time.
+  useEffect(() => {
+    const planId = searchParams.get("plan");
+    if (!planId) return;
+    const found = findOption(planId);
+    if (found && isLoggedIn()) {
+      if (found.cycle) setCycle(found.cycle);
+      setCheckout(found.option);
+    }
+    const rest = new URLSearchParams(searchParams);
+    rest.delete("plan");
+    setSearchParams(rest, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   const openCheckout = (option) => {
     if (!isLoggedIn()) {
       toast({ title: "Please sign in first",
               description: "A plan is attached to your account, so we need you signed in." });
-      navigate("/login");
+      // Back to this plan's checkout after login, not to the dashboard.
+      navigate(`/login?next=${encodeURIComponent(`/pricing?plan=${option.id}`)}`);
       return;
     }
     setCheckout(option);
