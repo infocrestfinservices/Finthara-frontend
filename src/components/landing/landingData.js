@@ -41,43 +41,49 @@ export const TESTIMONIALS = [
   { name: "Amir Khan", role: "Restaurant Chain, Delhi", text: "Used it for a government PMEGP scheme report. The AI knew exactly what format KVIC requires. Remarkable.", avatar: "AK" },
 ];
 
+// `id` is the server's plan key (services/entitlements.py). The price shown here is only for
+// display — what is charged is decided by the server. A plan with `billing` has a Monthly /
+// Yearly switch, and each option carries its own server plan id.
 export const PLANS = [
   {
-    name: "Basic",
-    tag: null,
+    id: "entrepreneur",
+    name: "Entrepreneur",
     price: "₹1,999",
-    period: "/ month",
-    description: "Everything Finthara offers, for a single user.",
-    color: "border-border",
-    headerBg: "bg-muted/40",
+    period: "one-time",
+    note: "Pay once — buy again whenever you need another report.",
+    description: "One complete project report for your own business.",
     features: [
-      { text: "Unlimited Reports", included: true },
-      { text: "Short & Long Format", included: true },
-      { text: "PDF + Word + Excel Export", included: true },
+      { text: "1 report", included: true },
+      { text: "Excel + Word report", included: true },
+      { text: "Online report on the website", included: true },
       { text: "CMA / SBA / All Bank & Scheme Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
-      { text: "Team Members", included: false },
     ],
-    cta: "Get Basic",
-    variant: "outline",
   },
   {
-    name: "Advanced",
-    tag: "Team Access",
-    price: "₹11,000",
-    period: "/ month",
-    description: "Everything in Basic, plus a team: invite an editor and a viewer alongside you.",
-    color: "border-primary",
-    headerBg: "bg-primary",
+    name: "Consultant & CA",
+    description: "For consultants and CAs preparing reports for many clients.",
+    billing: {
+      monthly: {
+        id: "consultant_monthly",
+        price: "₹11,000",
+        period: "/ month",
+        note: "Billed monthly.",
+      },
+      yearly: {
+        id: "consultant_yearly",
+        price: "₹119,988",
+        period: "/ year",
+        note: "₹9,999 / month, billed once a year.",
+      },
+    },
     features: [
-      { text: "Unlimited Reports", included: true },
-      { text: "Short & Long Format", included: true },
-      { text: "PDF + Word + Excel Export", included: true },
+      { text: "20 reports per month", included: true },
+      { text: "Excel + Word report", included: true },
+      { text: "Online report on the website", included: true },
       { text: "CMA / SBA / All Bank & Scheme Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
-      { text: "Team Members (3 seats — Owner, Editor, Viewer)", included: true },
+      { text: "2 team seats", included: true },
     ],
-    cta: "Get Advanced",
-    variant: "default",
   },
 ];

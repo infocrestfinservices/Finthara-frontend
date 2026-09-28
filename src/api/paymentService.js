@@ -83,7 +83,7 @@ export async function payForPlan(planId, { onStatus, coupon } = {}) {
       currency: order.currency,
       order_id: order.order_id,
       name: "Smart Project Blueprint",
-      description: `${order.plan?.name || planId} plan`,
+      description: order.plan?.name || planId,
       prefill: order.prefill || {},
       theme: { color: "#4F46E5" },
       handler: async (resp) => {
@@ -135,7 +135,7 @@ export async function getMyPlan() {
 }
 
 /**
- * Start AUTO-PAY for a monthly plan.
+ * Start AUTO-PAY for a monthly or yearly plan.
  *
  * Different from payForPlan in one way that matters: Razorpay's checkout is opened with a
  * `subscription_id` instead of an `order_id`, and what the customer authorises is a MANDATE,
@@ -177,7 +177,7 @@ export async function subscribeToPlan(planId, { onStatus } = {}) {
       key: sub.key_id,
       subscription_id: sub.subscription_id,
       name: "Smart Project Blueprint",
-      description: `${sub.plan?.label || planId} — billed monthly`,
+      description: `${sub.plan?.name || planId} — billed ${sub.plan?.period || "monthly"}`,
       prefill: sub.prefill || {},
       theme: { color: "#4F46E5" },
       handler: () => {

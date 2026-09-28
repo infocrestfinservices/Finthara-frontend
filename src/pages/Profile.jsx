@@ -417,7 +417,7 @@ function PlanTab() {
 
         <div className="mt-5 pt-4 border-t">
           <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-            Usage {plan.reports_limit !== null ? "this cycle" : ""}
+            Usage {plan.cycle_ends_at ? "this cycle" : ""}
           </p>
           {plan.reports_limit === null ? (
             <p className="text-sm">Unlimited reports</p>

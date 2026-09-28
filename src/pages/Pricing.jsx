@@ -20,7 +20,7 @@ export default function PricingPage() {
             Simple, transparent <span className="text-primary">pricing</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto leading-relaxed">
-            Every feature, on both plans. Add a team when you need one. No hidden fees.
+            Pay once for a single report, or subscribe for 20 reports a month with team seats. No hidden fees.
           </p>
         </div>
       </section>

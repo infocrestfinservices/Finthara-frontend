@@ -35,7 +35,8 @@ import {
   getCoupons, createCoupon, setCouponActive, getRepeatBuyers, getAdminInvoices,
 } from "@/api/adminService";
 
-const PLANS = ["free", "basic", "advanced"];
+// Legacy basic/advanced stay listed so staff can still see and fix accounts on them.
+const PLANS = ["free", "entrepreneur", "consultant_monthly", "consultant_yearly", "basic", "advanced"];
 
 const money = (n) =>
   `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -324,8 +325,11 @@ function MobileNav({ section, onSelect }) {
 const PLAN_FILTERS = [
   { id: "", label: "All" },
   { id: "free", label: "Free" },
-  { id: "basic", label: "Basic" },
-  { id: "advanced", label: "Advanced" },
+  { id: "entrepreneur", label: "Entrepreneur" },
+  { id: "consultant_monthly", label: "Consultant (Monthly)" },
+  { id: "consultant_yearly", label: "Consultant (Yearly)" },
+  { id: "basic", label: "Basic (legacy)" },
+  { id: "advanced", label: "Advanced (legacy)" },
 ];
 
 function UsersTab({ toast }) {
@@ -419,7 +423,7 @@ function UsersTab({ toast }) {
  *  goodwill extension, or a refund; the reason is recorded in the server log because there
  *  is no payment record to explain it later. */
 function PlanDialog({ user, onClose, onSaved }) {
-  const [plan, setPlan] = useState("basic");
+  const [plan, setPlan] = useState("entrepreneur");
   const [days, setDays] = useState("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
@@ -469,8 +473,9 @@ function PlanDialog({ user, onClose, onSaved }) {
               <Input type="number" placeholder="Leave blank for the plan's own period"
                      value={days} onChange={(e) => setDays(e.target.value)} />
               <p className="text-xs text-muted-foreground">
-                Blank uses the plan's normal period — 30 days for Basic and Advanced, no expiry
-                for Free. Enter 0 for no expiry.
+                Blank uses the plan's normal period — 30 days for Consultant (Monthly), 365 for
+                Consultant (Yearly), no expiry for Free. Enter 0 for no expiry. Entrepreneur ignores
+                this and adds one report credit.
               </p>
             </div>
             <div className="space-y-2">

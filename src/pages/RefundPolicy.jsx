@@ -49,15 +49,17 @@ export default function RefundPolicy() {
             service. A report is produced and made available to download as soon as it is
             generated, and there is nothing to ship or return.
           </p>
-          <p>We offer two plans, both billed every 30 days:</p>
+          <p>We offer two plans:</p>
           <ul className="list-disc pl-6 space-y-1">
             <li>
-              <strong>Basic (₹1,999 / month)</strong> — unlimited reports with PDF, Word and
-              Excel downloads, for a single user.
+              <strong>Entrepreneur (₹1,999, one-time)</strong> — one report, with the Excel
+              and Word report and the online report on the website, for a single user. Not a
+              subscription: buy it again whenever you need another report.
             </li>
             <li>
-              <strong>Advanced (₹11,000 / month)</strong> — everything in Basic, plus a team
-              of 3 seats (one owner and two invited members, as an editor or a viewer).
+              <strong>Consultant &amp; CA (₹11,000 / month, or ₹119,988 / year)</strong> — 20
+              reports per month in the same formats, plus 2 team seats (invited members, as an
+              editor or a viewer).
             </li>
           </ul>
         </Section>
@@ -82,14 +84,14 @@ export default function RefundPolicy() {
             withdraw work you have already received.
           </p>
           <p>
-            <strong>After 7 days</strong>, a payment is not refundable. On the monthly plans,
+            <strong>After 7 days</strong>, a payment is not refundable. On Consultant &amp; CA,
             you can cancel at any time so that you are not charged again — see below.
           </p>
         </Section>
 
-        <Section title="Cancelling a monthly plan">
+        <Section title="Cancelling Consultant &amp; CA">
           <p>
-            You can cancel Basic or Advanced at any time from your billing settings,
+            You can cancel Consultant &amp; CA (monthly or yearly) at any time from your billing settings,
             or by writing to {SUPPORT}.
           </p>
           <p>
