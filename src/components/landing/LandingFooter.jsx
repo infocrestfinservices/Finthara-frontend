@@ -53,7 +53,7 @@ export default function LandingFooter() {
               in minutes, for Indian and global entrepreneurs.
             </p>
             <p className="mt-4 text-sm font-medium text-foreground max-w-xs leading-relaxed">
-              Finthara is a product of Infocrest Finweb Private Limited.
+              Product by Infocrest Finweb Private Limited.
             </p>
           </div>
 
