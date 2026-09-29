@@ -52,6 +52,9 @@ export default function LandingFooter() {
               AI-powered feasibility studies and project reports — bank, scheme, and investor-ready
               in minutes, for Indian and global entrepreneurs.
             </p>
+            <p className="mt-4 text-sm font-medium text-foreground max-w-xs leading-relaxed">
+              Finthara is a product of Infocrest Finweb Private Limited.
+            </p>
           </div>
 
           {COLUMNS.map((col) => (
