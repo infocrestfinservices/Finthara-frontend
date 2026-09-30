@@ -528,22 +528,11 @@ function BillingTab() {
           <CreditCard className="w-4 h-4 text-muted-foreground" />
           <h3 className="font-semibold">Payment method</h3>
         </div>
-        {plan?.subscription ? (
-          <div className="text-sm space-y-1">
-            <p>
-              Auto-pay via Razorpay is <strong>{plan.subscription.auto_pay ? "on" : "off"}</strong>
-              {plan.subscription.next_charge_at ? ` · next charge ${day(plan.subscription.next_charge_at)}` : ""}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              Card/UPI details are held by Razorpay directly — we never see or store them.
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No saved payment method. Card/UPI details are handled entirely by Razorpay at
-            checkout and are never stored on our servers.
-          </p>
-        )}
+        <p className="text-sm text-muted-foreground">
+          No saved payment method, and nothing renews automatically — each plan is a single
+          payment. Card/UPI details are handled entirely by Cashfree (or PayPal) at checkout and
+          are never stored on our servers.
+        </p>
       </div>
     </div>
   );

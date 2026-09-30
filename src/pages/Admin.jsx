@@ -480,7 +480,7 @@ function PlanDialog({ user, onClose, onSaved }) {
             </div>
             <div className="space-y-2">
               <Label>Reason</Label>
-              <Input placeholder="e.g. payment did not register — Razorpay ref 12345"
+              <Input placeholder="e.g. payment did not register — Cashfree order fin_123_..."
                      value={reason} onChange={(e) => setReason(e.target.value)} />
               <p className="text-xs text-muted-foreground">
                 Recorded in the server log. Nothing else will explain this change later.

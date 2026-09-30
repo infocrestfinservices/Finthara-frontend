@@ -1,13 +1,13 @@
 /**
  * RefundPolicy.jsx — the Refund & Cancellation policy.
  *
- * Two reasons this page exists. Razorpay requires a published refund policy before it will
- * hand over live keys, so without it the product cannot take real money. And the pricing page
+ * Two reasons this page exists. The payment gateway (Cashfree) requires a published refund
+ * policy before it will hand over live keys, so without it the product cannot take real money. And the pricing page
  * already promises a "7-day money-back guarantee" to every visitor, which until now was a
  * promise with nothing behind it.
  *
  * Everything here describes what the SYSTEM ACTUALLY DOES — the billing cycle, what happens
- * on cancellation, when access ends — read off the entitlement and subscription code rather
+ * when a plan ends, what happens to a failed payment — read off the entitlement code rather
  * than drafted from a template. A policy that contradicts the software is worse than no
  * policy: it is a promise the product will break.
  */
@@ -84,34 +84,32 @@ export default function RefundPolicy() {
             withdraw work you have already received.
           </p>
           <p>
-            <strong>After 7 days</strong>, a payment is not refundable. On Consultant &amp; CA,
-            you can cancel at any time so that you are not charged again — see below.
+            <strong>After 7 days</strong>, a payment is not refundable. Nothing renews
+            automatically, so there is never a later charge to cancel — see below.
           </p>
         </Section>
 
-        <Section title="Cancelling Consultant &amp; CA">
+        <Section title="Renewal and cancellation">
           <p>
-            You can cancel Consultant &amp; CA (monthly or yearly) at any time from your billing settings,
-            or by writing to {SUPPORT}.
+            <strong>Consultant &amp; CA is a single payment for one period</strong> — a month or
+            a year — and <strong>does not renew automatically</strong>. We never charge you again
+            without you choosing to pay, so there is nothing to cancel.
           </p>
           <p>
-            <strong>Cancelling stops the next charge. It does not end your current month.</strong>{" "}
-            You keep full access until the end of the period you have already paid for, and
-            your plan then lapses automatically — new report generation and exports stop
-            until you subscribe again. We do not take back access you have paid for.
-          </p>
-          <p>
-            We do not charge part-months. If you cancel on day 3 of a cycle, you keep the plan
-            for the remaining 27 days and are not billed again.
+            You keep full access until the end of the period you paid for. The plan then lapses
+            on its own — new report generation and exports stop until you pay for another
+            period. Renewing before the end adds the new period on top of the time you still
+            have; nothing already paid for is lost.
           </p>
         </Section>
 
         <Section title="Failed payments">
           <p>
-            If a renewal payment fails, your card issuer is usually the reason and we will
-            retry. Access continues until the end of the period you have already paid for. If
-            the payment still has not gone through by then, the plan lapses — your projects
-            and reports are not deleted, and paying again restores access to them.
+            If a payment fails, the plan is not activated and you can simply try again. If
+            money left your account but the plan did not activate, write to {SUPPORT} with the
+            order reference — we check it with the payment gateway and either activate the plan
+            or make sure the amount is returned. Banks usually reverse a failed transaction on
+            their own within 5 to 7 working days.
           </p>
         </Section>
 

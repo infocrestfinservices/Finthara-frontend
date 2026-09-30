@@ -156,7 +156,6 @@ function PlanCard({ plan }) {
         <p className="text-sm text-muted-foreground mt-1">
           {left}
           {plan.expires_at ? ` · renews ${day(plan.expires_at)}` : ""}
-          {plan.subscription?.auto_pay ? " · auto-pay on" : ""}
         </p>
       </div>
       <Button asChild variant="outline" className="gap-1.5">

@@ -63,8 +63,8 @@ const AuthenticatedApp = () => {
       <Route path="/features" element={<FeaturesPage />} />
       <Route path="/how-it-works" element={<HowItWorksPage />} />
       <Route path="/pricing" element={<PricingPage />} />
-      {/* Public and unauthenticated on purpose: Razorpay checks this page before
-          issuing live keys, and a customer must be able to read it before paying. */}
+      {/* Public and unauthenticated on purpose: the payment gateway checks this page
+          before issuing live keys, and a customer must be able to read it before paying. */}
       <Route path="/refund-policy" element={<RefundPolicy />} />
       <Route path="/contact" element={<Contact />} />
 

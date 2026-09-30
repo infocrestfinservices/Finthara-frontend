@@ -8,15 +8,13 @@ import {
 } from "@/components/ui/dialog";
 import { CheckCircle2, Loader2, Tag, Check, CreditCard } from "lucide-react";
 import { PLANS } from "./landingData";
-import { getPaymentConfig, payForPlan, subscribeToPlan, previewCoupon, isLoggedIn } from "@/api/paymentService";
+import { getPaymentConfig, createOrder, openCheckout as openCashfree, verifyOrder, previewCoupon, isLoggedIn } from "@/api/paymentService";
 import { getPayPalConfig } from "@/api/paypalService";
 import PayPalCheckoutDialog from "./PayPalCheckoutDialog";
 import { useToast } from "@/components/ui/use-toast";
 
-// Plans billed on a cycle, and so sold with a mandate rather than a one-off charge. The
-// server refuses /payments/subscribe for anything else, so this only decides which checkout
-// to open — it is not what enforces the rule.
-const RECURRING = new Set(["consultant_monthly", "consultant_yearly"]);
+// How long one purchase of each plan lasts, for the confirmation message. Nothing renews
+// automatically: every plan is a single payment for one period (or one report).
 const CYCLE_WORD = { consultant_monthly: "month", consultant_yearly: "year" };
 
 /** The plan card + billing cycle that sells a given server plan id, or null. */
@@ -71,6 +69,23 @@ export default function Pricing({ showHeader = true }) {
     setSearchParams(rest, { replace: true });
   }, [searchParams, setSearchParams]);
 
+  // Coming back from Cashfree's own page (?cf_order=<id>) — some payment methods leave the
+  // site to finish. The server checks the order with Cashfree before anything is granted.
+  useEffect(() => {
+    const orderId = searchParams.get("cf_order");
+    if (!orderId) return;
+    const rest = new URLSearchParams(searchParams);
+    rest.delete("cf_order");
+    setSearchParams(rest, { replace: true });
+    if (!isLoggedIn()) return;
+    verifyOrder(orderId)
+      .then((r) => announce(r, null))
+      .catch((err) => toast({ title: "Payment could not be verified",
+                              description: err?.message || "Please contact support.",
+                              variant: "destructive" }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, setSearchParams]);
+
   const openCheckout = (option) => {
     if (!isLoggedIn()) {
       toast({ title: "Please sign in first",
@@ -82,54 +97,45 @@ export default function Pricing({ showHeader = true }) {
     setCheckout(option);
   };
 
-  const payWithRazorpay = async (option, appliedCode) => {
-    // The checkout dialog is closed BEFORE Razorpay opens: its focus trap would otherwise
-    // sit on top of Razorpay's own window and swallow clicks on it.
+  /** Tell the customer how a verified Cashfree order ended. */
+  const announce = (result, option) => {
+    if (!result) return;                                   // checkout closed — say nothing
+    if (result.status === "pending") {
+      toast({ title: "Payment is being confirmed",
+              description: "Your bank has not confirmed it yet. Your plan activates as soon "
+                         + "as it does — refresh this page in a minute." });
+      return;
+    }
+    if (result.status !== "paid") {
+      toast({ title: "Payment was not completed",
+              description: "No money was taken for this order. Please try again.",
+              variant: "destructive" });
+      return;
+    }
+    const planId = result.plan || option?.id;
+    if (planId === "entrepreneur") {
+      toast({ title: "Payment received",
+              description: "Your Entrepreneur report is ready to use — generate it any time." });
+      return;
+    }
+    toast({ title: "Payment received",
+            description: `You are on Consultant & CA for one ${CYCLE_WORD[planId] || "period"}. `
+                       + `It does not renew automatically — renew here before it ends.` });
+  };
+
+  /** Called from the dialog once the server has created the order: close the dialog (its
+   *  focus trap would sit on top of Cashfree's window and swallow clicks), open Cashfree,
+   *  then report what the server says happened. */
+  const payWithCashfree = async (option, order) => {
     setCheckout(null);
+    if (order.free) {
+      toast({ title: "Your plan is active",
+              description: order.message || `${option.name} is now active — nothing to pay.` });
+      return;
+    }
     setBusy(option.id);
     try {
-      // Cycle plans take a MANDATE, not a single charge — except when a coupon is applied:
-      // a coupon discounts one payment, so it is sold as a single period at the discounted
-      // price rather than silently dropped from an auto-pay mandate at full price.
-      let recurring = RECURRING.has(option.id) && !appliedCode;
-      let result;
-      if (recurring) {
-        try {
-          result = await subscribeToPlan(option.id, { onStatus: () => {} });
-        } catch (e) {
-          // Auto-pay not enabled on the payment account yet. Selling one period is far
-          // better than refusing the sale — the server grants exactly one period either way;
-          // only the renewal differs.
-          if (!e?.autoPayUnavailable) throw e;
-          recurring = false;
-          result = await payForPlan(option.id, { onStatus: () => {}, coupon: appliedCode });
-        }
-      } else {
-        result = await payForPlan(option.id, { onStatus: () => {}, coupon: appliedCode });
-      }
-      if (!result) return;                                 // checkout closed — say nothing
-
-      if (result.free) {
-        toast({ title: "Your plan is active",
-                description: result.message || `${option.name} is now active — nothing to pay.` });
-        return;
-      }
-      if (option.id === "entrepreneur") {
-        toast({ title: "Payment received",
-                description: "Your Entrepreneur report is ready to use — generate it any time." });
-        return;
-      }
-      const every = CYCLE_WORD[option.id] || "period";
-      toast(recurring
-        ? { title: "Auto-pay is set up",
-            // The plan is granted by a webhook, server to server, so it can land a moment
-            // after the browser is done. Promising it is already active would be a lie the
-            // user can see through by reloading.
-            description: `${option.name} will activate in a few seconds and renew every `
-                       + `${every}. You can cancel any time.` }
-        : { title: "Payment received",
-            description: `You are on ${option.name} for one ${every}. You can renew it here `
-                       + `before it ends.` });
+      announce(await openCashfree(order), option);
     } catch (err) {
       toast({ title: "Payment could not be completed",
               description: err?.message || "Please try again.", variant: "destructive" });
@@ -221,10 +227,10 @@ export default function Pricing({ showHeader = true }) {
 
       <CheckoutDialog
         option={checkout}
-        razorpay={payments.enabled}
+        cashfree={payments.enabled}
         paypal={paypal.enabled}
         onClose={() => setCheckout(null)}
-        onRazorpay={payWithRazorpay}
+        onCashfree={payWithCashfree}
         onPayPal={payWithPayPal}
       />
 
@@ -268,13 +274,35 @@ function BillingToggle({ cycle, onChange }) {
 }
 
 /** Step two of buying: the chosen plan, an optional coupon, and the ways to pay for it. */
-function CheckoutDialog({ option, razorpay, paypal, onClose, onRazorpay, onPayPal }) {
+function CheckoutDialog({ option, cashfree, paypal, onClose, onCashfree, onPayPal }) {
   const [coupon, setCoupon] = useState("");
   const [couponState, setCouponState] = useState(null);   // {valid, message, discount}
   const [checking, setChecking] = useState(false);
+  // Cashfree needs a mobile number. Asked for only when the server says the account has none.
+  const [needPhone, setNeedPhone] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState("");
 
   // A fresh dialog per plan: a code checked against one plan says nothing about another.
-  useEffect(() => { setCoupon(""); setCouponState(null); }, [option?.id]);
+  useEffect(() => {
+    setCoupon(""); setCouponState(null); setError(""); setStarting(false);
+  }, [option?.id]);
+
+  const startCashfree = async () => {
+    setStarting(true);
+    setError("");
+    try {
+      const order = await createOrder(option.id, { coupon: appliedCode, phone: needPhone ? phone : null });
+      setNeedPhone(false);
+      onCashfree(option, order);
+    } catch (err) {
+      if (err.phoneRequired) setNeedPhone(true);
+      setError(err.message || "Could not start the payment.");
+    } finally {
+      setStarting(false);
+    }
+  };
 
   const applyCoupon = async () => {
     const code = coupon.trim();
@@ -289,7 +317,7 @@ function CheckoutDialog({ option, razorpay, paypal, onClose, onRazorpay, onPayPa
   // Only a code the SERVER said was valid is sent. A rejected one is not smuggled along in
   // the hope the order endpoint is more forgiving — it is not, and it would fail the sale.
   const appliedCode = couponState?.valid ? coupon.trim() : null;
-  const none = !razorpay && !paypal;
+  const none = !cashfree && !paypal;
 
   return (
     <Dialog open={Boolean(option)} onOpenChange={(o) => !o && onClose()}>
@@ -311,7 +339,7 @@ function CheckoutDialog({ option, razorpay, paypal, onClose, onRazorpay, onPayPa
               </p>
             ) : (
               <div className="space-y-4">
-                {razorpay && (
+                {cashfree && (
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -335,19 +363,34 @@ function CheckoutDialog({ option, razorpay, paypal, onClose, onRazorpay, onPayPa
                         {couponState.message}
                       </p>
                     )}
-                    {appliedCode && RECURRING.has(option.id) && (
-                      <p className="text-xs text-muted-foreground">
-                        With a coupon this is a single {CYCLE_WORD[option.id]}'s payment — it
-                        won't renew automatically.
-                      </p>
-                    )}
                   </div>
                 )}
 
+                {cashfree && needPhone && (
+                  <div className="space-y-1.5">
+                    <Input
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="10-digit mobile number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && startCashfree()}
+                      autoFocus
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Required by the payment gateway. Saved to your profile.
+                    </p>
+                  </div>
+                )}
+                {error && <p className="text-sm text-destructive">{error}</p>}
+
                 <div className="flex flex-col gap-2">
-                  {razorpay && (
-                    <Button size="lg" className="w-full gap-2" onClick={() => onRazorpay(option, appliedCode)}>
-                      <CreditCard className="w-4 h-4" /> Pay with Razorpay
+                  {cashfree && (
+                    <Button size="lg" className="w-full gap-2" disabled={starting}
+                            onClick={startCashfree}>
+                      {starting
+                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Starting payment…</>
+                        : <><CreditCard className="w-4 h-4" /> Pay with Cashfree</>}
                     </Button>
                   )}
                   {paypal && (
@@ -356,10 +399,10 @@ function CheckoutDialog({ option, razorpay, paypal, onClose, onRazorpay, onPayPa
                     </Button>
                   )}
                 </div>
-                {razorpay && paypal && (
+                {cashfree && paypal && (
                   <p className="text-xs text-muted-foreground">
-                    Razorpay: UPI, cards and netbanking in INR. PayPal: cards in USD
-                    {appliedCode ? " (coupons apply to Razorpay payments only)" : ""}.
+                    Cashfree: UPI, cards and netbanking in INR. PayPal: cards in USD
+                    {appliedCode ? " (coupons apply to Cashfree payments only)" : ""}.
                   </p>
                 )}
               </div>
