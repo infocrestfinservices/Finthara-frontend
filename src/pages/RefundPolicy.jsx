@@ -52,12 +52,12 @@ export default function RefundPolicy() {
           <p>We offer two plans:</p>
           <ul className="list-disc pl-6 space-y-1">
             <li>
-              <strong>Entrepreneur (₹1,999, one-time)</strong> — one report, with the Excel
+              <strong>Entrepreneur (₹1,999 + GST, one-time)</strong> — one report, with the Excel
               and Word report and the online report on the website, for a single user. Not a
               subscription: buy it again whenever you need another report.
             </li>
             <li>
-              <strong>Consultant &amp; CA (₹11,000 / month, or ₹119,988 / year)</strong> — 20
+              <strong>Consultant &amp; CA (₹11,000 / month, or ₹119,988 / year, GST excluded)</strong> — 20
               reports per month in the same formats, plus 2 team seats (invited members, as an
               editor or a viewer).
             </li>
@@ -117,7 +117,7 @@ export default function RefundPolicy() {
           <p>
             Generation depends on AI services, and occasionally a report fails or comes back
             with something clearly wrong in it. That is our problem, not yours. Tell us at{" "}
-            {SUPPORT} and we will regenerate it at no cost. Regenerating an existing report
+            {SUPPORT} and we will regenerate it at no cost — on every plan. Regenerating an existing report
             never counts against your report allowance.
           </p>
           <p>

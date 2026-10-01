@@ -30,7 +30,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center lg:justify-start animate-fade-up animation-delay-300">
               <Link to="/create">
                 <Button size="lg" className="h-12 px-7 text-base gap-2 shadow-xl shadow-primary/30 w-full sm:w-auto group">
-                  Create free report
+                  Create your report
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>

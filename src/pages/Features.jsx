@@ -79,10 +79,10 @@ const CAPABILITIES = [
 // ── Comparison ───────────────────────────────────────────────────────────────
 const COMPARISON = [
   { label: "Turnaround time", rc: "5 minutes", ca: "2–3 weeks", diy: "Days of work" },
-  { label: "Cost per report", rc: "From ₹199", ca: "₹15,000+", diy: "Your time" },
+  { label: "Cost per report", rc: "₹1,999 + GST", ca: "₹15,000+", diy: "Your time" },
   { label: "Bank-format accuracy", rc: true, ca: true, diy: false },
   { label: "Interactive financial charts", rc: true, ca: false, diy: false },
-  { label: "Unlimited revisions", rc: true, ca: false, diy: true },
+  { label: "Regenerate with new inputs", rc: "Consultant & CA plan", ca: false, diy: true },
   { label: "PDF / Word / Excel export", rc: true, ca: false, diy: false },
 ];
 
@@ -95,9 +95,9 @@ const EXPORTS = [
 
 // ── FAQ ──────────────────────────────────────────────────────────────────────
 const FAQ = [
-  { q: "Is the first report really free?", a: "Yes — your first report is free, no credit card required. You only pay when you need more reports or premium export formats." },
-  { q: "Will banks accept an AI-generated report?", a: "Absolutely. Reports follow the exact CMA Data format Indian banks expect, with all required ratios and projections. Thousands have been submitted and approved." },
-  { q: "Can I edit the report after it's generated?", a: "Yes. Export to Word or Excel and edit freely, or regenerate sections by giving the AI new details — revisions are unlimited on paid plans." },
+  { q: "How much does a report cost?", a: "The Entrepreneur plan is ₹1,999 (GST excluded) for one report, paid once. Consultant & CA is ₹11,000 a month, or ₹9,999 a month billed yearly (GST excluded), for 20 reports a month and 2 team seats." },
+  { q: "Will banks accept an AI-generated report?", a: "Reports follow the CMA Data format Indian banks use, with the standard ratios and projections. Whether a loan is sanctioned is always the bank's own decision." },
+  { q: "Can I edit the report after it's generated?", a: "Yes. Download the Word and Excel files and edit them freely. Regenerating a report with new inputs is included in the Consultant & CA plan; on Entrepreneur, the report is generated once." },
   { q: "How accurate are the financial projections?", a: "The AI builds a complete 5-year model — P&L, cash flow and ratio analysis — based on your inputs and industry benchmarks, rendered as live charts you can verify." },
 ];
 

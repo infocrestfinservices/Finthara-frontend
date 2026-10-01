@@ -8,7 +8,6 @@ export { default as PhoneDemo } from "./PhoneDemo";
 export { default as PayPalCheckoutDialog } from "./PayPalCheckoutDialog";
 export { default as Industries } from "./Industries";
 export { default as ReportIncludes } from "./ReportIncludes";
-export { default as Testimonials } from "./Testimonials";
 export { default as Pricing } from "./Pricing";
 export { default as CTABanner } from "./CTABanner";
 export { default as MyReports } from "./MyReports";

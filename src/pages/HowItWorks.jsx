@@ -79,7 +79,7 @@ export default function HowItWorksPage() {
             and downloading a bank-ready report.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm">
-            {["Unlimited reports", "All export formats", "Edit anytime"].map((t) => (
+            {["Excel + Word report", "Bank CMA format", "Edit anytime"].map((t) => (
               <span key={t} className="inline-flex items-center gap-1.5 text-muted-foreground">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t}
               </span>
@@ -191,11 +191,11 @@ export default function HowItWorksPage() {
           That's the whole process.
         </h2>
         <p className="text-muted-foreground mb-7">
-          Start now — your first report is free, and you'll have it before your coffee gets cold.
+          Start now — you'll have your report before your coffee gets cold.
         </p>
         <Link to="/create">
           <Button size="lg" className="h-12 px-7 text-base gap-2 shadow-xl shadow-primary/30 group">
-            Try it free <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            Create your report <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </Link>
       </section>

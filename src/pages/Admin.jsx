@@ -975,7 +975,7 @@ function NewCouponDialog({ open, onClose, onCreated }) {
 
           <div className="space-y-2">
             <Label>Applies to</Label>
-            <Input placeholder="Blank for all paid plans, or e.g. basic, advanced"
+            <Input placeholder="Blank for all paid plans, or e.g. entrepreneur, consultant_monthly"
                    value={f.applies_to} onChange={set("applies_to")} />
           </div>
 

@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { reportStorage } from "@/api/localStorageService";
 import { invokeLLM } from "@/api/llmService";
 import { downloadExcel, downloadWord, generateModel, saveBranding, getBranding, fetchCoverImage } from "@/api/generationService";
+import { getMyPlan } from "@/api/paymentService";
 import { formatCurrency, purposes } from "@/lib/countryData";
 import { exportToPDF, exportToWord } from "@/lib/exportUtils";
 import { useAutoSave } from "@/hooks/useAutoSave";
@@ -82,6 +83,12 @@ export default function ReportViewer({ report: initialReport, onBack }) {
   const [isSavingContent, setIsSavingContent] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showExcelModal, setShowExcelModal] = useState(false);
+  // Whether this account's plan includes regeneration (Entrepreneur does not). Assumed yes
+  // until the server answers — the server enforces it either way.
+  const [canRegenerate, setCanRegenerate] = useState(true);
+  useEffect(() => {
+    getMyPlan().then((p) => { if (p && p.can_regenerate === false) setCanRegenerate(false); });
+  }, []);
   const [showBranding, setShowBranding] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState("saved"); // "saved" | "saving" | "unsaved"
@@ -228,7 +235,9 @@ export default function ReportViewer({ report: initialReport, onBack }) {
       await reportStorage.update(report.id, { [fieldKey]: newValue });
       toast({
         title: "Field updated",
-        description: "Click 'Regenerate Report' to rebuild the report with updated details.",
+        description: canRegenerate
+          ? "Click 'Regenerate' to rebuild the report with updated details."
+          : "Saved. Rebuilding the report with new details is included in the Consultant & CA plan.",
       });
     } catch (err) {
       setReport(previous);   // don't leave a value on screen that was never saved
@@ -452,22 +461,45 @@ FORMATTING RULES:
             <span className="hidden sm:inline">Edit Details</span>
             {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowReview(true)}
-            disabled={isRegenerating}
-            className="gap-2"
-          >
-            {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            <span className="hidden sm:inline">{isRegenerating ? "Regenerating..." : "Regenerate"}</span>
-          </Button>
+          {canRegenerate ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowReview(true)}
+              disabled={isRegenerating}
+              className="gap-2"
+            >
+              {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              <span className="hidden sm:inline">{isRegenerating ? "Regenerating..." : "Regenerate"}</span>
+            </Button>
+          ) : !report.word_report ? (
+            // Entrepreneur: the one further run its plan includes — this report's Word
+            // document, from the same inputs. The server refuses anything beyond it.
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => regenerateReport({}, undefined, true)}
+              disabled={isRegenerating}
+              className="gap-2"
+            >
+              {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+              <span className="hidden sm:inline">{isRegenerating ? "Creating Word report..." : "Create Word report"}</span>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" disabled className="gap-2"
+                    title="Regeneration is included in the Consultant & CA plan">
+              <RefreshCw className="w-4 h-4" />
+              <span className="hidden sm:inline line-through">Regenerate</span>
+            </Button>
+          )}
 
-          {/* Export Excel (financials) */}
-          <Button variant="outline" size="sm" onClick={() => setShowExcelModal(true)} className="gap-2 text-emerald-700 border-emerald-300 hover:bg-emerald-50">
-            <FileSpreadsheet className="w-4 h-4" />
-            <span className="hidden sm:inline">Excel</span>
-          </Button>
+          {/* Upload a revised Excel and rewrite the report from it — a regeneration */}
+          {canRegenerate && (
+            <Button variant="outline" size="sm" onClick={() => setShowExcelModal(true)} className="gap-2 text-emerald-700 border-emerald-300 hover:bg-emerald-50">
+              <FileSpreadsheet className="w-4 h-4" />
+              <span className="hidden sm:inline">Excel</span>
+            </Button>
+          )}
 
           {/* Export dropdown (PDF / Word) */}
           <div className="relative" ref={exportMenuRef}>
@@ -598,7 +630,10 @@ FORMATTING RULES:
         <div className="bg-card border rounded-xl p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-sm">Edit Report Details</h3>
-            <p className="text-xs text-muted-foreground">Edit fields below, then click "Regenerate" to rebuild the report</p>
+            <p className="text-xs text-muted-foreground">
+              {canRegenerate ? 'Edit fields below, then click "Regenerate" to rebuild the report'
+                             : "Edit the details shown on your report"}
+            </p>
           </div>
 
           {/* Which deliverable the downloads hand back. It needs NO regeneration: both
@@ -682,9 +717,11 @@ FORMATTING RULES:
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
-            <RefreshCw className="w-3 h-3" /> After editing, click <strong>"Regenerate"</strong> in the toolbar to rebuild the full report.
-          </p>
+          {canRegenerate && (
+            <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+              <RefreshCw className="w-3 h-3" /> After editing, click <strong>"Regenerate"</strong> in the toolbar to rebuild the full report.
+            </p>
+          )}
 
           {/* The client's own pictures, per section. Below the fields because it does NOT
               need a regeneration — the images are read at download time. */}

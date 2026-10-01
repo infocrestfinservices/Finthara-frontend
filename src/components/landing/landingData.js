@@ -35,15 +35,10 @@ export const STEPS = [
   { step: "03", title: "Download your report", desc: "Get a fully formatted CMA / SBA / investor-grade report in PDF, Word, or Excel in minutes.", icon: Download },
 ];
 
-export const TESTIMONIALS = [
-  { name: "Rajesh Mehta", role: "MSME Owner, Surat", text: "Got my SBI CMA data report in 4 minutes. The DSCR tables were perfect. My loan got approved in the first attempt.", avatar: "RM" },
-  { name: "Priya Nair", role: "Startup Founder, Bangalore", text: "The VC-grade financial model with IRR and cap table saved us at least ₹80,000 in CA fees. Investors loved the depth.", avatar: "PN" },
-  { name: "Amir Khan", role: "Restaurant Chain, Delhi", text: "Used it for a government PMEGP scheme report. The AI knew exactly what format KVIC requires. Remarkable.", avatar: "AK" },
-];
-
 // `id` is the server's plan key (services/entitlements.py). The price shown here is only for
 // display — what is charged is decided by the server. A plan with `billing` has a Monthly /
 // Yearly switch, and each option carries its own server plan id.
+
 export const PLANS = [
   {
     id: "entrepreneur",
@@ -58,7 +53,10 @@ export const PLANS = [
       { text: "Online report on the website", included: true },
       { text: "CMA Model & All Bank Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
+      { text: "Regeneration", included: false },
     ],
+    // Not sold yet — keep "coming soon" until AI credits can actually be bought.
+    footnote: "Need to regenerate? AI credits — 5 regenerations for ₹399 + GST (coming soon).",
   },
   {
     name: "Consultant & CA",
@@ -84,6 +82,7 @@ export const PLANS = [
       { text: "CMA Model & All Bank Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
       { text: "2 team seats", included: true },
+      { text: "Regeneration with new inputs", included: true },
     ],
   },
 ];

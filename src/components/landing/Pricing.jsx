@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { CheckCircle2, Loader2, Tag, Check, CreditCard } from "lucide-react";
+import { X, Loader2, Tag, Check, CreditCard } from "lucide-react";
 import { PLANS } from "./landingData";
 import { getPaymentConfig, createOrder, openCheckout as openCashfree, verifyOrder, previewCoupon, isLoggedIn } from "@/api/paymentService";
 import { getPayPalConfig } from "@/api/paypalService";
@@ -185,6 +185,7 @@ export default function Pricing({ showHeader = true }) {
                     <div className="flex items-end gap-1.5">
                       <span className="text-4xl font-heading font-bold">{option.price}</span>
                       <span className="text-muted-foreground text-sm mb-1">{option.period}</span>
+                      <span className="text-muted-foreground text-xs mb-1.5">· GST excluded</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1.5">{option.note}</p>
                   </div>
@@ -193,12 +194,17 @@ export default function Pricing({ showHeader = true }) {
 
                 {/* Features */}
                 <div className="px-6 py-6 flex-1 flex flex-col gap-3">
-                  {plan.features.filter((f) => f.included).map((f) => (
+                  {plan.features.map((f) => (
                     <div key={f.text} className="flex items-start gap-2.5 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-foreground">{f.text}</span>
+                      <FeatureIcon included={f.included} />
+                      <span className={f.included ? "text-foreground" : "text-muted-foreground"}>
+                        {f.text}
+                      </span>
                     </div>
                   ))}
+                  {plan.footnote && (
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{plan.footnote}</p>
+                  )}
                 </div>
 
                 {/* CTA — payment options only appear after this is clicked */}
@@ -244,6 +250,18 @@ export default function Pricing({ showHeader = true }) {
         />
       )}
     </section>
+  );
+}
+
+/** Solid green tick for what a plan includes, solid red cross for what it does not. */
+function FeatureIcon({ included }) {
+  return (
+    <span className={`mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full ${
+      included ? "bg-emerald-500" : "bg-rose-500"}`}>
+      {included
+        ? <Check className="h-2.5 w-2.5 text-white" strokeWidth={3.5} />
+        : <X className="h-2.5 w-2.5 text-white" strokeWidth={3.5} />}
+    </span>
   );
 }
 
@@ -327,7 +345,7 @@ function CheckoutDialog({ option, cashfree, paypal, onClose, onCashfree, onPayPa
             <DialogHeader>
               <DialogTitle>{option.name}</DialogTitle>
               <DialogDescription>
-                {option.price} {option.period} · {option.note}
+                {option.price} {option.period} (GST excluded) · {option.note}
               </DialogDescription>
             </DialogHeader>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function CTABanner() {
   return (
@@ -12,15 +12,12 @@ export default function CTABanner() {
         <div className="absolute -bottom-24 -right-10 w-80 h-80 rounded-full bg-emerald-300/20 blur-3xl animate-float" />
 
         <div className="relative max-w-2xl mx-auto">
-          <span className="inline-flex items-center gap-2 bg-white/15 text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-5 backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5" /> First report is on us
-          </span>
           <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white mb-4 leading-tight">
             Ready to create a report that gets funded?
           </h2>
           <p className="text-white/85 mb-8 text-base sm:text-lg">
-            Join thousands of entrepreneurs who submitted professional CMA reports, feasibility
-            studies, and investor decks — and got approved.
+            Bank-format CMA reports, feasibility studies and investor models — with the Excel
+            workbook and the Word report built from the same numbers.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/create">

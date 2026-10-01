@@ -105,7 +105,7 @@ export default function LandingNavbar() {
               </Link>
               <Link to="/register">
                 <Button size="sm" className="h-9 px-4 gap-1.5 shadow-md shadow-primary/20">
-                  Create free report <ArrowRight className="w-4 h-4" />
+                  Create report <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
