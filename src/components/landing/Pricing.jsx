@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { X, Loader2, Tag, Check, CreditCard } from "lucide-react";
 import { PLANS } from "./landingData";
-import { getPaymentConfig, createOrder, openCheckout as openCashfree, verifyOrder, previewCoupon, isLoggedIn } from "@/api/paymentService";
+import { getPaymentConfig, createOrder, openCheckout as openCashfree, verifyOrder, previewCoupon, isLoggedIn, getMyPlan } from "@/api/paymentService";
 import { getPayPalConfig } from "@/api/paypalService";
 import PayPalCheckoutDialog from "./PayPalCheckoutDialog";
 import { useToast } from "@/components/ui/use-toast";
@@ -234,6 +234,8 @@ export default function Pricing({ showHeader = true }) {
       <CheckoutDialog
         option={checkout}
         cashfree={payments.enabled}
+        gstConfig={payments.gst}
+        planAmounts={Object.fromEntries((payments.plans || []).map((p) => [p.id, p.amount]))}
         paypal={paypal.enabled}
         onClose={() => setCheckout(null)}
         onCashfree={payWithCashfree}
@@ -292,7 +294,9 @@ function BillingToggle({ cycle, onChange }) {
 }
 
 /** Step two of buying: the chosen plan, an optional coupon, and the ways to pay for it. */
-function CheckoutDialog({ option, cashfree, paypal, onClose, onCashfree, onPayPal }) {
+const inr = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+function CheckoutDialog({ option, cashfree, gstConfig, planAmounts, paypal, onClose, onCashfree, onPayPal }) {
   const [coupon, setCoupon] = useState("");
   const [couponState, setCouponState] = useState(null);   // {valid, message, discount}
   const [checking, setChecking] = useState(false);
@@ -301,17 +305,47 @@ function CheckoutDialog({ option, cashfree, paypal, onClose, onCashfree, onPayPa
   const [phone, setPhone] = useState("");
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+  // GST billing details — asked for only when GST applies, pre-filled from last time.
+  const gstOn = Boolean(cashfree && gstConfig?.registered);
+  const [state, setState] = useState("");
+  const [isBusiness, setIsBusiness] = useState(false);
+  const [gstin, setGstin] = useState("");
+  const [company, setCompany] = useState("");
 
   // A fresh dialog per plan: a code checked against one plan says nothing about another.
   useEffect(() => {
     setCoupon(""); setCouponState(null); setError(""); setStarting(false);
   }, [option?.id]);
 
+  useEffect(() => {
+    if (!option || !gstOn) return;
+    getMyPlan().then((p) => {
+      const b = p?.billing || {};
+      if (b.state) setState(b.state);
+      if (b.gstin) { setIsBusiness(true); setGstin(b.gstin); setCompany(b.company || ""); }
+    });
+  }, [option?.id, gstOn]);
+
+  // What will be charged. Display only — the server computes the real amount.
+  const listAmount = Number(planAmounts?.[option?.id] || 0);
+  const base = couponState?.valid ? Number(couponState.final_amount) : listAmount;
+  const taxAmount = gstOn ? Math.round(base * (gstConfig.rate || 0) * 100) / 100 : 0;
+  const totalAmount = Math.round((base + taxAmount) * 100) / 100;
+
   const startCashfree = async () => {
     setStarting(true);
     setError("");
     try {
-      const order = await createOrder(option.id, { coupon: appliedCode, phone: needPhone ? phone : null });
+      if (gstOn && !state && !(isBusiness && gstin.trim())) {
+        setError("Please choose your state — it decides how GST is applied.");
+        return;
+      }
+      const order = await createOrder(option.id, {
+        coupon: appliedCode, phone: needPhone ? phone : null,
+        state: gstOn ? state : null,
+        gstin: gstOn && isBusiness ? gstin.trim() : null,
+        company: gstOn && isBusiness ? company.trim() : null,
+      });
       setNeedPhone(false);
       onCashfree(option, order);
     } catch (err) {
@@ -384,6 +418,54 @@ function CheckoutDialog({ option, cashfree, paypal, onClose, onCashfree, onPayPa
                   </div>
                 )}
 
+                {gstOn && (
+                  <div className="space-y-2">
+                    <select
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                      aria-label="Your state"
+                    >
+                      <option value="">Select your state (for GST)</option>
+                      {(gstConfig.states || []).map((s) => (
+                        <option key={s.code} value={s.code}>{s.name}</option>
+                      ))}
+                    </select>
+                    <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <input type="checkbox" checked={isBusiness}
+                             onChange={(e) => setIsBusiness(e.target.checked)} />
+                      Business purchase — add my GSTIN to the invoice
+                    </label>
+                    {isBusiness && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Input placeholder="GSTIN (15 characters)" className="uppercase"
+                               value={gstin} onChange={(e) => setGstin(e.target.value)} />
+                        <Input placeholder="Registered business name"
+                               value={company} onChange={(e) => setCompany(e.target.value)} />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {cashfree && listAmount > 0 && (
+                  <dl className="rounded-lg border bg-muted/30 px-3 py-2.5 text-sm space-y-1">
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">Price{couponState?.valid ? " after coupon" : ""}</dt>
+                      <dd className="tabular-nums">{inr(base)}</dd>
+                    </div>
+                    {gstOn && (
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">GST {Math.round((gstConfig.rate || 0) * 100)}%</dt>
+                        <dd className="tabular-nums">{inr(taxAmount)}</dd>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-semibold border-t pt-1">
+                      <dt>Total payable</dt>
+                      <dd className="tabular-nums">{inr(totalAmount)}</dd>
+                    </div>
+                  </dl>
+                )}
+
                 {cashfree && needPhone && (
                   <div className="space-y-1.5">
                     <Input
@@ -419,7 +501,8 @@ function CheckoutDialog({ option, cashfree, paypal, onClose, onCashfree, onPayPa
                 </div>
                 {cashfree && paypal && (
                   <p className="text-xs text-muted-foreground">
-                    Cashfree: UPI, cards and netbanking in INR. PayPal: cards in USD
+                    Cashfree: UPI, cards and netbanking in INR{gstOn ? ", GST added" : ""}.
+                    PayPal: cards in USD, for customers outside India
                     {appliedCode ? " (coupons apply to Cashfree payments only)" : ""}.
                   </p>
                 )}

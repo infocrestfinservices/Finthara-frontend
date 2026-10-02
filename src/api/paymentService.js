@@ -58,18 +58,21 @@ function loadCheckout() {
  * Throws an error with `phoneRequired = true` when the account has no mobile number — the
  * caller asks for one and calls again with `phone`.
  */
-export async function createOrder(planId, { coupon, phone } = {}) {
-  // The code goes up; the PRICE comes back. Nothing here can influence what is charged.
+export async function createOrder(planId, { coupon, phone, state, gstin, company } = {}) {
+  // The code goes up; the PRICE comes back. Nothing here can influence what is charged —
+  // GST included: the state and GSTIN only decide how the tax is split on the invoice.
   const res = await fetch(`${BACKEND_URL}/payments/order`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ plan: planId, coupon: coupon || null, phone: phone || null }),
+    body: JSON.stringify({ plan: planId, coupon: coupon || null, phone: phone || null,
+                           state: state || null, gstin: gstin || null, company: company || null }),
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
     const d = body?.detail;
     const err = new Error((typeof d === "string" ? d : d?.message) || "Could not start the payment.");
     err.phoneRequired = Boolean(d && typeof d === "object" && d.phone_required);
+    err.stateRequired = Boolean(d && typeof d === "object" && d.state_required);
     throw err;
   }
   if (body.free) return { free: true, ...body };

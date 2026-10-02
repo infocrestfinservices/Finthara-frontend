@@ -225,9 +225,15 @@ function InvoiceView({ id, onBack, onDownload, busy }) {
         <div className="grid gap-8 sm:grid-cols-2">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">To</p>
-            <p className="font-medium">{inv.customer.name || inv.customer.email}</p>
+            {inv.customer.company ? <p className="font-medium">{inv.customer.company}</p> : null}
+            <p className={inv.customer.company ? "text-sm" : "font-medium"}>
+              {inv.customer.name || inv.customer.email}
+            </p>
             {inv.customer.name ? (
               <p className="text-sm text-muted-foreground">{inv.customer.email}</p>
+            ) : null}
+            {inv.customer.gstin ? (
+              <p className="text-sm text-muted-foreground">GSTIN {inv.customer.gstin}</p>
             ) : null}
           </div>
           <div>
@@ -276,7 +282,7 @@ function InvoiceView({ id, onBack, onDownload, busy }) {
                   <td className="py-4 text-muted-foreground">{inv.sac_code}</td>
                 ) : null}
                 <td className="py-4 text-right tabular-nums">
-                  {money(isTax ? inv.taxable_value : inv.gross, inv.currency)}
+                  {money((inv.taxable_value || 0) + (inv.discount || 0), inv.currency)}
                 </td>
               </tr>
               {inv.coupon_code && inv.discount ? (
@@ -296,8 +302,17 @@ function InvoiceView({ id, onBack, onDownload, busy }) {
         <div className="border-t pt-5 flex justify-end">
           <dl className="w-full max-w-xs space-y-2 text-sm">
             {isTax ? (
-              <Row label={`Includes GST ${Math.round(inv.tax_rate * 100)}%`}
-                   value={money(inv.tax_total, inv.currency)} />
+              <>
+                <Row label="Taxable value" value={money(inv.taxable_value, inv.currency)} />
+                {inv.cgst || inv.sgst ? (
+                  <>
+                    <Row label={`CGST ${(inv.tax_rate * 100) / 2}%`} value={money(inv.cgst, inv.currency)} />
+                    <Row label={`SGST ${(inv.tax_rate * 100) / 2}%`} value={money(inv.sgst, inv.currency)} />
+                  </>
+                ) : inv.igst ? (
+                  <Row label={`IGST ${Math.round(inv.tax_rate * 100)}%`} value={money(inv.igst, inv.currency)} />
+                ) : null}
+              </>
             ) : null}
             <Row label="Total" value={money(inv.total, inv.currency)} />
             <Row label="Less amount paid" value={money(inv.amount_paid, inv.currency)} />
@@ -319,6 +334,7 @@ function InvoiceView({ id, onBack, onDownload, busy }) {
             </p>
           ) : null}
           {inv.place_of_supply ? <p>Place of supply: {inv.place_of_supply}</p> : null}
+          {inv.tax_note ? <p>{inv.tax_note}</p> : null}
           <p>This is a computer-generated document and needs no signature.</p>
         </div>
       </div>
