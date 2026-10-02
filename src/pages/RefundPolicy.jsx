@@ -53,15 +53,20 @@ export default function RefundPolicy() {
           <ul className="list-disc pl-6 space-y-1">
             <li>
               <strong>Entrepreneur (₹1,999 + GST, one-time)</strong> — one report, with the Excel
-              and Word report and the online report on the website, for a single user. Not a
-              subscription: buy it again whenever you need another report.
+              and Word report and the online report on the website, for a single user, with 1
+              regeneration of that report included. Not a subscription: buy it again whenever
+              you need another report.
             </li>
             <li>
               <strong>Consultant &amp; CA (₹11,000 / month, or ₹119,988 / year, GST excluded)</strong> — 20
-              reports per month in the same formats, plus 2 team seats (invited members, as an
-              editor or a viewer).
+              reports per month in the same formats, 2 regenerations included per report, plus 2
+              team seats (invited members, as an editor or a viewer).
             </li>
           </ul>
+          <p>
+            Further regenerations of a report, beyond those included, are ₹50 + GST each, bought
+            for that report.
+          </p>
         </Section>
 
         <Section title="Refunds">

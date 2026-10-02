@@ -53,10 +53,9 @@ export const PLANS = [
       { text: "Online report on the website", included: true },
       { text: "CMA Model & All Bank Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
-      { text: "Regeneration", included: false },
+      { text: "1 regeneration per report", included: true },
     ],
-    // Not sold yet — keep "coming soon" until AI credits can actually be bought.
-    footnote: "Need to regenerate? AI credits — 5 regenerations for ₹399 + GST (coming soon).",
+    footnote: "Extra regenerations: ₹50 + GST each.",
   },
   {
     name: "Consultant & CA",
@@ -82,7 +81,8 @@ export const PLANS = [
       { text: "CMA Model & All Bank Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
       { text: "2 team seats", included: true },
-      { text: "Regeneration with new inputs", included: true },
+      { text: "2 regenerations per report", included: true },
     ],
+    footnote: "Extra regenerations: ₹50 + GST each.",
   },
 ];

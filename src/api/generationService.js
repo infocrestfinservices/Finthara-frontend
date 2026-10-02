@@ -233,6 +233,20 @@ export async function saveInserts(projectId, inserts) {
 
 // The project's cover artwork — the same image the Word report's cover carries, generated
 // once and cached server-side, so the screen and the document can never disagree.
+/** How many regenerations this report has left ({included, used, paid_credits, left, price};
+ *  left = null means unlimited), or null if the server could not say. */
+export async function getRegenerations(projectId) {
+  try {
+    const res = await fetch(`${BACKEND_URL}/generate/${projectId}/regenerations`, {
+      headers: authHeaders(false),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchCoverImage(projectId) {
   // Fetched rather than set as an <img src>: the endpoint needs the JWT in a header, and
   // an <img> tag cannot send one. Returns an object URL, or "" when there is no artwork.

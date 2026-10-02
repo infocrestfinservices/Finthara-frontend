@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Copy, ArrowLeft, FileText, Palette, Edit3, Save, X, RefreshCw, Loader2, Check, ChevronDown, ChevronUp, Download, FileSpreadsheet, FileType, Cloud, CloudOff, ImagePlus, Paintbrush } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { reportStorage } from "@/api/localStorageService";
 import { invokeLLM } from "@/api/llmService";
-import { downloadExcel, downloadWord, generateModel, saveBranding, getBranding, fetchCoverImage } from "@/api/generationService";
-import { getMyPlan } from "@/api/paymentService";
+import { downloadExcel, downloadWord, generateModel, saveBranding, getBranding, fetchCoverImage, getRegenerations } from "@/api/generationService";
+import { verifyOrder } from "@/api/paymentService";
+import BuyRegenerationDialog from "@/components/report/BuyRegenerationDialog";
 import { formatCurrency, purposes } from "@/lib/countryData";
 import { exportToPDF, exportToWord } from "@/lib/exportUtils";
 import { useAutoSave } from "@/hooks/useAutoSave";
@@ -83,12 +84,52 @@ export default function ReportViewer({ report: initialReport, onBack }) {
   const [isSavingContent, setIsSavingContent] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showExcelModal, setShowExcelModal] = useState(false);
-  // Whether this account's plan includes regeneration (Entrepreneur does not). Assumed yes
-  // until the server answers — the server enforces it either way.
-  const [canRegenerate, setCanRegenerate] = useState(true);
+  // Regenerations left for THIS report (the plan includes 1 or 2 per report; more are
+  // bought). When none are left, Regenerate offers to buy one first — the server enforces it
+  // either way.
+  const [regen, setRegen] = useState(null);           // {included, used, paid_credits, left, price}
+  const [showBuyRegen, setShowBuyRegen] = useState(false);
+  const [afterPurchase, setAfterPurchase] = useState(null);   // "review" | "excel"
+  const refreshRegen = () => getRegenerations(report.id).then((s) => s && setRegen(s));
+  useEffect(() => { refreshRegen(); }, [report.id]);   // eslint-disable-line react-hooks/exhaustive-deps
+
+  const startRegeneration = async (kind) => {
+    const s = await getRegenerations(report.id);
+    if (s) setRegen(s);
+    if (s && s.left === 0) {
+      setAfterPurchase(kind);
+      setShowBuyRegen(true);
+      return;
+    }
+    if (kind === "excel") setShowExcelModal(true); else setShowReview(true);
+  };
+
+  const regenerationPurchased = async (paid) => {
+    await refreshRegen();
+    if (!paid) {
+      toast({ title: "Payment is being confirmed",
+              description: "Your regeneration unlocks as soon as the bank confirms it." });
+      return;
+    }
+    toast({ title: "Regeneration purchased",
+            description: "Choose what to change — the report will be regenerated once." });
+    if (afterPurchase === "excel") setShowExcelModal(true); else setShowReview(true);
+  };
+
+  // Back from Cashfree's own page after buying a regeneration (?cf_order=…).
+  const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
-    getMyPlan().then((p) => { if (p && p.can_regenerate === false) setCanRegenerate(false); });
-  }, []);
+    const orderId = searchParams.get("cf_order");
+    if (!orderId) return;
+    const rest = new URLSearchParams(searchParams);
+    rest.delete("cf_order");
+    setSearchParams(rest, { replace: true });
+    verifyOrder(orderId)
+      .then((r) => regenerationPurchased(r?.status === "paid"))
+      .catch(() => {});
+  }, [searchParams]);   // eslint-disable-line react-hooks/exhaustive-deps
+
+  const regenLabel = regen && regen.left !== null ? ` (${regen.left} left)` : "";
   const [showBranding, setShowBranding] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState("saved"); // "saved" | "saving" | "unsaved"
@@ -235,9 +276,7 @@ export default function ReportViewer({ report: initialReport, onBack }) {
       await reportStorage.update(report.id, { [fieldKey]: newValue });
       toast({
         title: "Field updated",
-        description: canRegenerate
-          ? "Click 'Regenerate' to rebuild the report with updated details."
-          : "Saved. Rebuilding the report with new details is included in the Consultant & CA plan.",
+        description: "Click 'Regenerate' to rebuild the report with updated details.",
       });
     } catch (err) {
       setReport(previous);   // don't leave a value on screen that was never saved
@@ -292,6 +331,7 @@ export default function ReportViewer({ report: initialReport, onBack }) {
         setEditedContent(fresh.report_content || "");
       }
       setShowReview(false);
+      refreshRegen();
       toast({
         title: "Report regenerated",
         description: Object.keys(changedAnswers).length || (instructions || "").trim()
@@ -408,6 +448,7 @@ FORMATTING RULES:
       setReport(prev => ({ ...prev, report_content: newContent }));
       setEditedContent(newContent);
       clearLocalBackup();
+      refreshRegen();
       toast({ title: "Report Regenerated!", description: "Report updated with your revised financial figures." });
     } catch {
       toast({ title: "Regeneration failed", variant: "destructive" });
@@ -461,45 +502,24 @@ FORMATTING RULES:
             <span className="hidden sm:inline">Edit Details</span>
             {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </Button>
-          {canRegenerate ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowReview(true)}
-              disabled={isRegenerating}
-              className="gap-2"
-            >
-              {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-              <span className="hidden sm:inline">{isRegenerating ? "Regenerating..." : "Regenerate"}</span>
-            </Button>
-          ) : !report.word_report ? (
-            // Entrepreneur: the one further run its plan includes — this report's Word
-            // document, from the same inputs. The server refuses anything beyond it.
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => regenerateReport({}, undefined, true)}
-              disabled={isRegenerating}
-              className="gap-2"
-            >
-              {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-              <span className="hidden sm:inline">{isRegenerating ? "Creating Word report..." : "Create Word report"}</span>
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" disabled className="gap-2"
-                    title="Regeneration is included in the Consultant & CA plan">
-              <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline line-through">Regenerate</span>
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => startRegeneration("review")}
+            disabled={isRegenerating}
+            className="gap-2"
+          >
+            {isRegenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            <span className="hidden sm:inline">
+              {isRegenerating ? "Regenerating..." : `Regenerate${regenLabel}`}
+            </span>
+          </Button>
 
-          {/* Upload a revised Excel and rewrite the report from it — a regeneration */}
-          {canRegenerate && (
-            <Button variant="outline" size="sm" onClick={() => setShowExcelModal(true)} className="gap-2 text-emerald-700 border-emerald-300 hover:bg-emerald-50">
-              <FileSpreadsheet className="w-4 h-4" />
-              <span className="hidden sm:inline">Excel</span>
-            </Button>
-          )}
+          {/* Upload a revised Excel and rewrite the report from it — also a regeneration */}
+          <Button variant="outline" size="sm" onClick={() => startRegeneration("excel")} className="gap-2 text-emerald-700 border-emerald-300 hover:bg-emerald-50">
+            <FileSpreadsheet className="w-4 h-4" />
+            <span className="hidden sm:inline">Excel</span>
+          </Button>
 
           {/* Export dropdown (PDF / Word) */}
           <div className="relative" ref={exportMenuRef}>
@@ -630,10 +650,7 @@ FORMATTING RULES:
         <div className="bg-card border rounded-xl p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-sm">Edit Report Details</h3>
-            <p className="text-xs text-muted-foreground">
-              {canRegenerate ? 'Edit fields below, then click "Regenerate" to rebuild the report'
-                             : "Edit the details shown on your report"}
-            </p>
+            <p className="text-xs text-muted-foreground">Edit fields below, then click "Regenerate" to rebuild the report</p>
           </div>
 
           {/* Which deliverable the downloads hand back. It needs NO regeneration: both
@@ -717,11 +734,9 @@ FORMATTING RULES:
               </div>
             ))}
           </div>
-          {canRegenerate && (
-            <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
-              <RefreshCw className="w-3 h-3" /> After editing, click <strong>"Regenerate"</strong> in the toolbar to rebuild the full report.
-            </p>
-          )}
+          <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+            <RefreshCw className="w-3 h-3" /> After editing, click <strong>"Regenerate"</strong> in the toolbar to rebuild the full report.
+          </p>
 
           {/* The client's own pictures, per section. Below the fields because it does NOT
               need a regeneration — the images are read at download time. */}
@@ -859,6 +874,14 @@ FORMATTING RULES:
           )}
         </div>
       </div>
+
+      <BuyRegenerationDialog
+        open={showBuyRegen}
+        projectId={Number(report.id)}
+        status={regen}
+        onClose={() => setShowBuyRegen(false)}
+        onPurchased={regenerationPurchased}
+      />
 
       {showExcelModal && (
         <ExcelUploadModal
