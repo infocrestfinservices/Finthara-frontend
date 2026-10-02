@@ -34,7 +34,7 @@ export default function ContactForm({
   lockEmail = false,
 }) {
   const { toast } = useToast();
-  const [info, setInfo] = useState({ email: "support@infocrest.in", form_enabled: true });
+  const [info, setInfo] = useState({ email: "infocrestfinservices@gmail.com", form_enabled: true });
   const [form, setForm] = useState({
     name: defaultName, email: defaultEmail, message: "", company: "", topic: defaultTopic,
   });

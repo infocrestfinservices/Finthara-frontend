@@ -17,7 +17,7 @@ import { LandingNavbar, LandingFooter } from "@/components/landing";
 import { Mail } from "lucide-react";
 
 const UPDATED = "12 August 2026";
-const SUPPORT = "support@infocrest.in";
+const SUPPORT = "infocrestfinservices@gmail.com";
 
 function Section({ title, children }) {
   return (

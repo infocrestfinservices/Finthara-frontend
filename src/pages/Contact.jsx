@@ -14,7 +14,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 export default function Contact() {
   const [params] = useSearchParams();
   const topic = ["advanced", "consultant"].includes(params.get("topic")) ? "Consultant & CA plan" : "Sales question";
-  const [info, setInfo] = useState({ email: "support@infocrest.in", company: null, address: null });
+  const [info, setInfo] = useState({ email: "infocrestfinservices@gmail.com", company: null, address: null });
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/contact`)
