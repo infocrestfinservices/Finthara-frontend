@@ -235,6 +235,9 @@ function InvoiceView({ id, onBack, onDownload, busy }) {
             {inv.customer.gstin ? (
               <p className="text-sm text-muted-foreground">GSTIN {inv.customer.gstin}</p>
             ) : null}
+            {isTax && inv.place_of_supply ? (
+              <p className="text-sm text-muted-foreground">State: {inv.place_of_supply}</p>
+            ) : null}
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">From</p>
@@ -324,6 +327,13 @@ function InvoiceView({ id, onBack, onDownload, busy }) {
             </div>
           </dl>
         </div>
+
+        {inv.total_in_words ? (
+          <div className="mt-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Amount in words</p>
+            <p className="text-sm mt-0.5">{inv.total_in_words}</p>
+          </div>
+        ) : null}
 
         <hr className="my-7" />
         <div className="text-xs text-muted-foreground space-y-1">
