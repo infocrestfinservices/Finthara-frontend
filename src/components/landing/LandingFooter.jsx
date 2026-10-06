@@ -45,14 +45,14 @@ export default function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2">
             <Link to="/" className="inline-flex mb-4">
-              <Logo size="xl" />
+              <Logo size="xl" onDark />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               AI-powered feasibility studies and project reports — bank, scheme, and investor-ready
               in minutes, for Indian and global entrepreneurs.
             </p>
             <p className="mt-4 text-sm font-medium text-foreground max-w-xs leading-relaxed">
-              Product by Infocrest Finweb Private Limited.
+              Product by Infocrest Finweb Private Limited
             </p>
           </div>
 

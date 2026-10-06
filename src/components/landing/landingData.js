@@ -39,6 +39,11 @@ export const STEPS = [
 // display — what is charged is decided by the server. A plan with `billing` has a Monthly /
 // Yearly switch, and each option carries its own server plan id.
 
+// Price of one team member beyond the 2 included in Consultant & CA, in rupees per month,
+// GST extra. Shown in the "Need a bigger team?" box on the pricing page — the ONLY place to
+// set it. Leave "" until it is decided; the box then shows "₹____".
+export const EXTRA_MEMBER_PRICE = "";
+
 export const PLANS = [
   {
     id: "entrepreneur",

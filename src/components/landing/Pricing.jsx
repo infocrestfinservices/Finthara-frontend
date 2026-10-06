@@ -224,11 +224,6 @@ export default function Pricing({ showHeader = true }) {
             );
           })}
         </div>
-
-        {/* Trust line */}
-        <p className="text-center text-sm text-muted-foreground mt-10">
-          🔒 Secure payments · <Link to="/refund-policy" className="underline hover:text-foreground">7-day money-back guarantee</Link> · Invoice on every plan
-        </p>
       </div>
 
       <CheckoutDialog

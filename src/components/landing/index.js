@@ -12,3 +12,4 @@ export { default as Pricing } from "./Pricing";
 export { default as CTABanner } from "./CTABanner";
 export { default as MyReports } from "./MyReports";
 export { default as LandingFooter } from "./LandingFooter";
+export { default as TeamContact } from "./TeamContact";

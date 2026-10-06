@@ -21,21 +21,52 @@ const SIZES = {
 
 const SOURCES = ["/logo.svg", "/logo.png"];
 
-export default function Logo({ size = "md", showText = true, subtitle, subtitleClassName, className }) {
+// On a dark background (the footer) the navy parts of logo.png — "FIN" with the navy half of
+// the curve, and the tagline — disappear. These clip boxes, as fractions of the 1440×720
+// image, cover just those parts; a white layer masked by the logo's own shape is shown
+// inside them, so "THARA" and the icon keep their colours.
+const DARK_BG_WHITE_PARTS = [
+  "inset(0 65.7% 31% 0)",           // "FIN" and the navy half of the curve
+  "inset(68.5% 14% 24.5% 14%)",     // "REPORT CRAFTING MADE SIMPLE"
+];
+
+export default function Logo({ size = "md", showText = true, subtitle, subtitleClassName, className, onDark = false }) {
   const s = SIZES[size];
   // Try .svg, then .png, then give up and use the placeholder — see the doc comment above.
   const [srcIndex, setSrcIndex] = useState(0);
   const failed = srcIndex >= SOURCES.length;
 
   if (!failed) {
+    const src = SOURCES[srcIndex];
+    const whiten = onDark && src.endsWith(".png");
+    const img = (
+      <img
+        src={src}
+        alt="Finthara AI"
+        className={cn(s.img, "w-auto object-contain", whiten && "block")}
+        onError={() => setSrcIndex((i) => i + 1)}
+      />
+    );
     return (
       <span className={cn("inline-flex flex-col items-start gap-0.5", className)}>
-        <img
-          src={SOURCES[srcIndex]}
-          alt="Finthara AI"
-          className={cn(s.img, "w-auto object-contain")}
-          onError={() => setSrcIndex((i) => i + 1)}
-        />
+        {whiten ? (
+          <span className="relative inline-block">
+            {img}
+            {DARK_BG_WHITE_PARTS.map((clip) => (
+              <span
+                key={clip}
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-white"
+                style={{
+                  WebkitMaskImage: `url(${src})`, maskImage: `url(${src})`,
+                  WebkitMaskSize: "100% 100%", maskSize: "100% 100%",
+                  WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
+                  clipPath: clip,
+                }}
+              />
+            ))}
+          </span>
+        ) : img}
         {subtitle && (
           <span className={cn("block text-[11px] text-muted-foreground leading-tight", subtitleClassName)}>{subtitle}</span>
         )}
