@@ -179,7 +179,9 @@ export default function Admin() {
                 <div className="text-xs font-medium">
                   {user?.full_name || user?.email?.split("@")[0] || "admin"}
                 </div>
-                <div className="text-[10px] uppercase tracking-wide text-amber-400">Super Admin</div>
+                <div className="text-[10px] uppercase tracking-wide text-amber-400">
+                  {user?.is_super_admin ? "Super Admin" : "Admin"}
+                </div>
               </div>
             </div>
           </div>
@@ -197,7 +199,7 @@ export default function Admin() {
             <div className="rounded-xl border border-border bg-gradient-to-r from-primary/15 to-transparent p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold">Welcome back, {user?.full_name || "Super Admin"}</h2>
+                  <h2 className="text-xl font-semibold">Welcome back, {user?.full_name || "Admin"}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Live snapshot of every user, report and payment on the platform.
                   </p>
@@ -258,6 +260,7 @@ const SECTIONS = [
 ];
 
 function Sidebar({ section, onSelect, onLogout }) {
+  const { user } = useAuth();
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-card md:flex">
       <div className="flex items-center gap-3 border-b border-border px-5 py-4">
@@ -267,7 +270,7 @@ function Sidebar({ section, onSelect, onLogout }) {
         <div className="leading-tight">
           <div className="text-sm font-semibold">Admin Console</div>
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Super Admin
+            {user?.is_super_admin ? "Super Admin" : "Admin"}
           </div>
         </div>
       </div>

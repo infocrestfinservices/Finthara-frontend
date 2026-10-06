@@ -53,6 +53,8 @@ export default function RolesTab({ toast }) {
   }
 
   const lastAdmin = data.admin_count <= 1;
+  // Only the super admin may change roles; everyone else sees the list read-only.
+  const canManage = Boolean(data.can_manage);
 
   return (
     <div className="space-y-5">
@@ -113,12 +115,13 @@ export default function RolesTab({ toast }) {
                         ? "bg-amber-500/15 text-amber-400"
                         : "bg-muted text-muted-foreground"}`}>
                       {u.role === "admin" ? <ShieldCheck className="h-3 w-3" /> : null}
-                      {u.role}
+                      {u.super_admin ? "super admin" : u.role}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{u.plan}</td>
                   <td className="px-4 py-3 text-muted-foreground">{when(u.created_at)}</td>
                   <td className="px-4 py-3 text-right">
+                    {canManage && !u.super_admin ? (
                     <Button
                       size="sm"
                       variant={u.role === "admin" ? "ghost" : "outline"}
@@ -131,6 +134,7 @@ export default function RolesTab({ toast }) {
                     >
                       {u.role === "admin" ? "Remove admin" : "Make admin"}
                     </Button>
+                    ) : null}
                   </td>
                 </tr>
               );
