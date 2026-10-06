@@ -8,7 +8,7 @@
  * Dashboard.jsx for the same reason: one place that knows how to list and render a report.
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,9 @@ export default function Profile() {
   const { user, logout, checkUserAuth } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  // ?tab=team opens straight on that tab (e.g. coming back from buying a team seat).
+  const [params] = useSearchParams();
+  const initialTab = params.get("tab") || "basic";
 
   const load = useCallback(async () => {
     try {
@@ -77,7 +80,7 @@ export default function Profile() {
             <Loader2 className="w-5 h-5 animate-spin" /> Loading…
           </div>
         ) : (
-          <Tabs defaultValue="basic" className="mt-8">
+          <Tabs defaultValue={initialTab} className="mt-8">
             <TabsList className="flex w-full overflow-x-auto no-scrollbar h-auto gap-1 bg-muted/40 p-1 justify-start">
               <TabsTrigger value="basic" className="gap-1.5 text-xs sm:text-sm py-2 shrink-0 whitespace-nowrap">
                 <User className="w-3.5 h-3.5" /> Basic Info

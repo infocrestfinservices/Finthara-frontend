@@ -58,7 +58,7 @@ function loadCheckout() {
  * Throws an error with `phoneRequired = true` when the account has no mobile number — the
  * caller asks for one and calls again with `phone`.
  */
-export async function createOrder(planId, { coupon, phone, state, gstin, company, projectId } = {}) {
+export async function createOrder(planId, { coupon, phone, state, gstin, company, projectId, seatId } = {}) {
   // The code goes up; the PRICE comes back. Nothing here can influence what is charged —
   // GST included: the state and GSTIN only decide how the tax is split on the invoice.
   const res = await fetch(`${BACKEND_URL}/payments/order`, {
@@ -66,7 +66,7 @@ export async function createOrder(planId, { coupon, phone, state, gstin, company
     headers: authHeaders(),
     body: JSON.stringify({ plan: planId, coupon: coupon || null, phone: phone || null,
                            state: state || null, gstin: gstin || null, company: company || null,
-                           project_id: projectId || null }),
+                           project_id: projectId || null, seat_id: seatId || null }),
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {

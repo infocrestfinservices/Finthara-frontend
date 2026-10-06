@@ -42,7 +42,7 @@ export const STEPS = [
 // Price of one team member beyond the 2 included in Consultant & CA, in rupees per month,
 // GST extra. Shown in the "Need a bigger team?" box on the pricing page — the ONLY place to
 // set it. Leave "" until it is decided; the box then shows "₹____".
-export const EXTRA_MEMBER_PRICE = "";
+export const EXTRA_MEMBER_PRICE = "200";
 
 export const PLANS = [
   {

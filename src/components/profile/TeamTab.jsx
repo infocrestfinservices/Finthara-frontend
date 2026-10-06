@@ -12,9 +12,9 @@
  *   editor — the above, plus create / edit / generate
  */
 import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
-  Users, UserPlus, Trash2, Loader2, Crown, Eye, Pencil, Clock, LogOut, ShieldCheck,
+  Users, UserPlus, Trash2, Loader2, Crown, Eye, Pencil, Clock, LogOut, ShieldCheck, Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { teamService } from "@/api/teamService";
+import { verifyOrder } from "@/api/paymentService";
+import BuySeatDialog from "@/components/profile/BuySeatDialog";
+
+const dayMonth = (iso) => (iso ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "");
 
 const roleIcon = { viewer: Eye, editor: Pencil, owner: Crown };
 
@@ -66,6 +70,22 @@ export default function TeamTab() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Back from Cashfree's own page after buying a seat (?cf_order=…).
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const orderId = searchParams.get("cf_order");
+    if (!orderId) return;
+    const rest = new URLSearchParams(searchParams);
+    rest.delete("cf_order");
+    setSearchParams(rest, { replace: true });
+    verifyOrder(orderId)
+      .then((r) => {
+        if (r?.status === "paid") toast({ title: "Seat added", description: "You can invite one more person." });
+        load();
+      })
+      .catch(() => {});
+  }, [searchParams]);   // eslint-disable-line react-hooks/exhaustive-deps
+
   if (loading) {
     return (
       <div className="flex justify-center py-16">
@@ -91,7 +111,16 @@ function OwnerTeamCard({ team, audit, onChange }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("viewer");
   const [busy, setBusy] = useState(false);
+  const [buySeat, setBuySeat] = useState(null);      // null | { seatId } — the seat dialog
   const seatsFull = team.seats_used >= team.seats_limit;
+  const seatPrice = team.extra_seat_price || 200;
+
+  const seatPurchased = (paid) => {
+    toast(paid
+      ? { title: "Seat added", description: "You can invite one more person now." }
+      : { title: "Payment is being confirmed", description: "The seat appears as soon as the bank confirms it." });
+    onChange();
+  };
 
   const invite = async () => {
     if (!email.trim()) return;
@@ -154,9 +183,44 @@ function OwnerTeamCard({ team, audit, onChange }) {
         </div>
         {seatsFull && (
           <p className="text-xs text-amber-600 dark:text-amber-500 -mt-3 mb-4">
-            All seats are taken. Remove a member or upgrade your plan to add more.
+            All seats are taken. Add a seat below, or remove a member.
           </p>
         )}
+
+        {/* Paid seats beyond the plan's own — ₹200 + GST per seat per month */}
+        <div className="rounded-lg border bg-muted/30 p-3 mb-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm">
+              Need more people? <span className="text-muted-foreground">
+                ₹{seatPrice} + GST per seat, per month</span>
+            </p>
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setBuySeat({ seatId: null })}>
+              <Plus className="w-4 h-4" /> Add a seat
+            </Button>
+          </div>
+          {team.extra_seats?.length > 0 && (
+            <ul className="mt-3 space-y-1.5">
+              {team.extra_seats.map((s, i) => (
+                <li key={s.id} className="flex items-center justify-between gap-2 text-xs">
+                  <span className="text-muted-foreground">
+                    Extra seat {i + 1} · active until {dayMonth(s.expires_at)}
+                  </span>
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setBuySeat({ seatId: s.id })}>
+                    Renew
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <BuySeatDialog
+          open={Boolean(buySeat)}
+          seatId={buySeat?.seatId}
+          price={seatPrice}
+          onClose={() => setBuySeat(null)}
+          onPurchased={seatPurchased}
+        />
 
         <div className="divide-y">
           <MemberRow member={{ role: "owner", email: "You", full_name: null, is_owner: true }} isSelf />
