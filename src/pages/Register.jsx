@@ -19,6 +19,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +32,11 @@ export default function Register() {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (!agreed) {
+      setError("Please accept the Terms & Conditions and Privacy Policy to continue");
       return;
     }
 
@@ -124,6 +130,22 @@ export default function Register() {
             required
           />
         </div>
+
+        <label className="flex items-start gap-2 text-sm text-muted-foreground">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 accent-primary"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            required
+          />
+          <span>
+            I agree to the{" "}
+            <Link to="/terms" target="_blank" className="text-primary underline">Terms &amp; Conditions</Link>{" "}
+            and{" "}
+            <Link to="/privacy" target="_blank" className="text-primary underline">Privacy Policy</Link>.
+          </span>
+        </label>
 
         <Button
           type="submit"

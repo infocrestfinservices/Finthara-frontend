@@ -7,6 +7,7 @@
  * configured, it surfaces a mailto: link so the message never just disappears.
  */
 import React, { useEffect, useState } from "react";
+import { SUPPORT_EMAIL } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +35,7 @@ export default function ContactForm({
   lockEmail = false,
 }) {
   const { toast } = useToast();
-  const [info, setInfo] = useState({ email: "infocrestfinservices@gmail.com", form_enabled: true });
+  const [info, setInfo] = useState({ email: SUPPORT_EMAIL, form_enabled: true });
   const [form, setForm] = useState({
     name: defaultName, email: defaultEmail, message: "", company: "", topic: defaultTopic,
   });

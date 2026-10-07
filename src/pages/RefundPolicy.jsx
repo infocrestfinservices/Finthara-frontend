@@ -15,9 +15,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
 import { Mail } from "lucide-react";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 const UPDATED = "12 August 2026";
-const SUPPORT = "infocrestfinservices@gmail.com";
+const SUPPORT = SUPPORT_EMAIL;
 
 function Section({ title, children }) {
   return (

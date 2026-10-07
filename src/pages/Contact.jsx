@@ -8,13 +8,14 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
 import ContactForm from "@/components/ContactForm";
+import { SUPPORT_EMAIL } from "@/lib/company";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 export default function Contact() {
   const [params] = useSearchParams();
   const topic = ["advanced", "consultant"].includes(params.get("topic")) ? "Consultant & CA plan" : "Sales question";
-  const [info, setInfo] = useState({ email: "infocrestfinservices@gmail.com", company: null, address: null });
+  const [info, setInfo] = useState({ email: SUPPORT_EMAIL, company: null, address: null });
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/contact`)

@@ -20,6 +20,8 @@ import FeaturesPage from '@/pages/Features';
 import HowItWorksPage from '@/pages/HowItWorks';
 import PricingPage from '@/pages/Pricing';
 import RefundPolicy from '@/pages/RefundPolicy';
+import Terms from '@/pages/Terms';
+import Privacy from '@/pages/Privacy';
 import CreateReport from '@/pages/CreateReport';
 import ViewReport from '@/pages/ViewReport';
 import Dashboard from '@/pages/Dashboard';
@@ -66,6 +68,8 @@ const AuthenticatedApp = () => {
       {/* Public and unauthenticated on purpose: the payment gateway checks this page
           before issuing live keys, and a customer must be able to read it before paying. */}
       <Route path="/refund-policy" element={<RefundPolicy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
 
       {/* Authenticated app pages */}
