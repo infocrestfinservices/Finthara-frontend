@@ -174,7 +174,52 @@ async function streamDownload(projectId, kind) {
   URL.revokeObjectURL(url);
 }
 
-export const downloadExcel = (projectId) => streamDownload(projectId, "excel");
+async function excelCall(projectId, path, method) {
+  const res = await fetch(`${BACKEND_URL}/generate/${projectId}/excel/${path}`, {
+    method,
+    headers: authHeaders(false),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = planAwareError(res, body, `Download failed (${res.status})`);
+    err.missingRoute = res.status === 404 || res.status === 405;
+    throw err;
+  }
+  return body; // { status: "ready" | "running" | "failed" | "none", error? }
+}
+
+/**
+ * Download the Excel workbook.
+ *
+ * Building it (template fill + recalculation) can take longer than the ~100 s the hosting
+ * platform lets one request run, which ended in a 504. So the server builds it in the
+ * background: we ask it to prepare the file, poll until it is ready, then download the
+ * finished file — the same workbook, it just no longer has to fit in one request.
+ */
+export async function downloadExcel(projectId) {
+  let st;
+  try {
+    st = await excelCall(projectId, "prepare", "POST");
+  } catch (err) {
+    // A backend that predates the background build: download directly, as before.
+    if (err.missingRoute) return streamDownload(projectId, "excel");
+    throw err;
+  }
+  const deadline = Date.now() + 12 * 60 * 1000;
+  while (st.status === "running" || st.status === "none") {
+    if (Date.now() > deadline) {
+      throw new Error("The Excel file is taking too long to prepare. Please try again.");
+    }
+    await sleep(3000);
+    st = await excelCall(projectId, "status", "GET");
+    // "none" mid-wait means the server restarted and lost the build — start it again.
+    if (st.status === "none") st = await excelCall(projectId, "prepare", "POST");
+  }
+  if (st.status === "failed") {
+    throw new Error(st.error || "The Excel file could not be prepared. Please try again.");
+  }
+  return streamDownload(projectId, "excel");
+}
 export const downloadWord = (projectId) => streamDownload(projectId, "word");
 
 // Logo + brand colour for this project's report. Stored server-side (in the project's
