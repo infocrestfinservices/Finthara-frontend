@@ -946,6 +946,11 @@ export default function CreateReport() {
                   100% { transform: translateX(300%); }
                 }`}</style>
 
+                <p className="text-sm font-medium text-foreground">
+                  {isLongFormat
+                    ? "Report generation takes up to 5–7 minutes."
+                    : "Short report generation takes up to 2–3 minutes."}
+                </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Your CMA report is being prepared for your business in the{" "}
                   <strong>{isLongFormat ? "long" : "short"}</strong> format.
