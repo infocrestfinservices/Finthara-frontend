@@ -61,7 +61,7 @@ export default function Pricing({ showHeader = true }) {
   const [busy, setBusy] = useState("");
   const [myPlan, setMyPlan] = useState(null);             // signed-in customer's plan
 
-  // The plan this customer already has, so its card reads "Available" rather than "Get
+  // The plan this customer already has, so its card reads "Subscribed" rather than "Get
   // Plan". Opens the Consultant card on the cycle they are on, so they see it.
   useEffect(() => {
     if (!isLoggedIn()) return;
@@ -249,7 +249,7 @@ export default function Pricing({ showHeader = true }) {
                         {currentNote(myPlan)}
                       </p>
                       <Button className="w-full gap-1.5" size="lg" variant="outline" disabled>
-                        <Check className="w-4 h-4" /> Available
+                        <Check className="w-4 h-4" /> Subscribed
                       </Button>
                     </>
                   ) : (
