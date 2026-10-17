@@ -34,6 +34,21 @@ function selected(plan, cycle) {
   return { ...plan, ...plan.billing[cycle] };
 }
 
+/** Is this option the plan the signed-in customer already has and can still use? Then the
+ *  card says so instead of selling it again. Entrepreneur counts only while a bought report
+ *  is still unused — once it is spent, buying another is exactly what the card is for. */
+function isCurrent(option, myPlan) {
+  if (!myPlan || myPlan.plan !== option.id) return false;
+  if (option.id === "entrepreneur") return Number(myPlan.reports_left || 0) > 0;
+  return true;
+}
+
+function currentNote(myPlan) {
+  const left = myPlan.reports_left;
+  if (left === null || left === undefined) return "Your current plan";
+  return `Your current plan · ${left} report${left === 1 ? "" : "s"} left`;
+}
+
 export default function Pricing({ showHeader = true }) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -44,6 +59,20 @@ export default function Pricing({ showHeader = true }) {
   const [checkout, setCheckout] = useState(null);         // {id, name, price, period, note}
   const [paypalPlan, setPaypalPlan] = useState(null);     // {id, name} for the PayPal dialog
   const [busy, setBusy] = useState("");
+  const [myPlan, setMyPlan] = useState(null);             // signed-in customer's plan
+
+  // The plan this customer already has, so its card reads "Available" rather than "Get
+  // Plan". Opens the Consultant card on the cycle they are on, so they see it.
+  useEffect(() => {
+    if (!isLoggedIn()) return;
+    let cancelled = false;
+    getMyPlan().then((p) => {
+      if (cancelled || !p) return;
+      setMyPlan(p);
+      if (p.plan === "consultant_yearly") setCycle("yearly");
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   // Whether checkout is available is the SERVER's answer — it holds the keys. Without
   // this the dialog would offer to take money the backend cannot accept.
@@ -97,6 +126,8 @@ export default function Pricing({ showHeader = true }) {
     setCheckout(option);
   };
 
+  const refreshPlan = () => getMyPlan().then((p) => p && setMyPlan(p));
+
   /** Tell the customer how a verified Cashfree order ended. */
   const announce = (result, option) => {
     if (!result) return;                                   // checkout closed — say nothing
@@ -112,6 +143,7 @@ export default function Pricing({ showHeader = true }) {
               variant: "destructive" });
       return;
     }
+    refreshPlan();
     const planId = result.plan || option?.id;
     if (planId === "entrepreneur") {
       toast({ title: "Payment received",
@@ -129,6 +161,7 @@ export default function Pricing({ showHeader = true }) {
   const payWithCashfree = async (option, order) => {
     setCheckout(null);
     if (order.free) {
+      refreshPlan();
       toast({ title: "Your plan is active",
               description: order.message || `${option.name} is now active — nothing to pay.` });
       return;
@@ -152,6 +185,7 @@ export default function Pricing({ showHeader = true }) {
   const paypalSuccess = (plan, result) => {
     setPaypalPlan(null);
     if (result.status === "paid") {
+      refreshPlan();
       toast({ title: "Payment received", description: `You are on ${plan.name}.` });
     }
   };
@@ -209,16 +243,27 @@ export default function Pricing({ showHeader = true }) {
 
                 {/* CTA — payment options only appear after this is clicked */}
                 <div className="px-6 pb-6 mt-auto">
-                  <Button
-                    className="w-full"
-                    size="lg"
-                    disabled={Boolean(busy)}
-                    onClick={() => openCheckout(option)}
-                  >
-                    {busy === option.id
-                      ? <><Loader2 className="w-4 h-4 animate-spin mr-1.5" /> Opening checkout…</>
-                      : "Get Plan"}
-                  </Button>
+                  {isCurrent(option, myPlan) ? (
+                    <>
+                      <p className="text-xs text-center text-muted-foreground mb-2">
+                        {currentNote(myPlan)}
+                      </p>
+                      <Button className="w-full gap-1.5" size="lg" variant="outline" disabled>
+                        <Check className="w-4 h-4" /> Available
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      disabled={Boolean(busy)}
+                      onClick={() => openCheckout(option)}
+                    >
+                      {busy === option.id
+                        ? <><Loader2 className="w-4 h-4 animate-spin mr-1.5" /> Opening checkout…</>
+                        : "Get Plan"}
+                    </Button>
+                  )}
                 </div>
               </div>
             );
