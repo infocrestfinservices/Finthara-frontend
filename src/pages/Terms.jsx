@@ -12,7 +12,7 @@ import { LandingNavbar, LandingFooter } from "@/components/landing";
 import { Mail } from "lucide-react";
 import { COMPANY_NAME, SUPPORT_EMAIL, COMPANY_CITY } from "@/lib/company";
 
-const UPDATED = "7 October 2026";
+const UPDATED = "21 October 2026";
 
 function Section({ title, children }) {
   return (
@@ -57,6 +57,21 @@ export default function Terms() {
           </p>
         </Section>
 
+        <Section title="Accuracy">
+          <p>
+            Reports, financial projections, assumptions and insights produced by Finthara are
+            generated with the help of artificial intelligence. They may contain inaccuracies,
+            errors or omissions, and we do not guarantee that any report is complete, accurate
+            or error-free.
+          </p>
+          <p>
+            You are responsible for reviewing and verifying all information in a report before
+            relying on it, and before submitting it to a bank, lender, investor, government
+            body or any other third party. Any reliance you place on a report is at your own
+            discretion.
+          </p>
+        </Section>
+
         <Section title="Your account">
           <ul className="list-disc pl-6 space-y-1">
             <li>Give accurate details and keep your password private. You are responsible for
@@ -88,8 +103,8 @@ export default function Terms() {
               you paid for and then ends unless you pay again.</li>
           </ul>
           <p>
-            Refunds are covered by our{" "}
-            <Link className="text-primary underline" to="/refund-policy">Refund &amp;
+            Renewals and cancellations are covered by our{" "}
+            <Link className="text-primary underline" to="/renewal-policy">Renewal &amp;
             Cancellation Policy</Link>.
           </p>
         </Section>
@@ -131,10 +146,14 @@ export default function Terms() {
 
         <Section title="Liability">
           <p>
-            To the extent the law allows, we are not liable for indirect or consequential
-            losses — such as a declined loan, lost profit or lost opportunity — arising from
-            the use of Finthara or of a report it produced, and our total liability to you is
-            limited to the amount you paid us in the 12 months before the claim.
+            To the fullest extent permitted by applicable law, Finthara shall not be liable for
+            any indirect, incidental or consequential loss — including a declined or reduced
+            loan, loss of profit, or loss of business opportunity — arising out of or in
+            connection with your use of Finthara or of any report generated through it.
+          </p>
+          <p>
+            Nothing in these terms excludes or limits any liability that cannot be excluded or
+            limited under applicable law.
           </p>
         </Section>
 

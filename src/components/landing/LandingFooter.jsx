@@ -29,7 +29,7 @@ const COLUMNS = [
       { label: "Contact", to: "/contact" },
       { label: "Terms & Conditions", to: "/terms" },
       { label: "Privacy Policy", to: "/privacy" },
-      { label: "Refund & Cancellation", to: "/refund-policy" },
+      { label: "Renewal & Cancellation", to: "/renewal-policy" },
     ],
   },
 ];
