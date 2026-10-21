@@ -8,8 +8,13 @@ import { LandingNavbar, LandingFooter } from "@/components/landing";
 import {
   MessageSquare, Globe2, BarChart3, FileDown, Check, X, ArrowRight,
   Sparkles, FileText, FileSpreadsheet, FileType, IndianRupee, Clock,
-  CheckCircle2, Bot, User,
+  CheckCircle2, Bot, User, ImagePlus, RefreshCw, Image as ImageIcon,
 } from "lucide-react";
+import { REGEN_PRICE, FREE_REGENERATIONS } from "@/components/landing/landingData";
+
+const ENT_REGENS = FREE_REGENERATIONS.entrepreneur;
+const CA_REGENS = FREE_REGENERATIONS.consultant;
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 // Re-reveals each row as it scrolls into view — the page reads static
 // otherwise, since nothing on it moves until you interact with the FAQ.
@@ -74,6 +79,26 @@ const CAPABILITIES = [
     points: ["Polished PDF", "Editable Word", "Live Excel financials"],
     visual: "export",
   },
+  {
+    icon: ImagePlus,
+    eyebrow: "Your own pictures",
+    title: "Add your photos and logo to the report",
+    desc: "Pick any section of your report and add a photograph — your site, machinery, product or premises. It is placed at the end of that section in the Word report, sized to match the rest of the document, with a numbered caption. Add your logo and brand colour too.",
+    points: ["Choose the section it goes in", "Numbered captions + List of Figures", "No regeneration needed"],
+    visual: "inserts",
+  },
+  {
+    icon: RefreshCw,
+    eyebrow: "Regenerate",
+    title: "Change your inputs, rebuild the report",
+    desc: "Open Edit Details to see every figure your model was built from. Change any of them, or tell the AI in your own words what you want different, and regenerate. Change nothing and the same figures come back — no surprises.",
+    points: [
+      `${plural(ENT_REGENS, "regeneration")} per report on Entrepreneur, ${CA_REGENS} on Consultant & CA`,
+      `Then ₹${REGEN_PRICE} + GST each`,
+      "Excel only in moments, or the full Word report too",
+    ],
+    visual: "regen",
+  },
 ];
 
 // ── Comparison ───────────────────────────────────────────────────────────────
@@ -82,7 +107,7 @@ const COMPARISON = [
   { label: "Cost per report", rc: "₹1,999 + GST", ca: "₹15,000+", diy: "Your time" },
   { label: "Bank-format accuracy", rc: true, ca: true, diy: false },
   { label: "Interactive financial charts", rc: true, ca: false, diy: false },
-  { label: "Regenerate with new inputs", rc: "1–2 per report, then ₹50", ca: false, diy: true },
+  { label: "Regenerate with new inputs", rc: `${ENT_REGENS}–${CA_REGENS} per report, then ₹${REGEN_PRICE}`, ca: false, diy: true },
   { label: "PDF / Word / Excel export", rc: true, ca: false, diy: false },
 ];
 
@@ -97,8 +122,15 @@ const EXPORTS = [
 const FAQ = [
   { q: "How much does a report cost?", a: "The Entrepreneur plan is ₹1,999 (GST excluded) for one report, paid once. Consultant & CA is ₹11,000 a month, or ₹9,999 a month billed yearly (GST excluded), for 20 reports a month and 2 team seats." },
   { q: "Will banks accept an AI-generated report?", a: "Reports follow the CMA Data format Indian banks use, with the standard ratios and projections. Whether a loan is sanctioned is always the bank's own decision." },
-  { q: "Can I edit the report after it's generated?", a: "Yes. Download the Word and Excel files and edit them freely. Each report includes regenerations with new inputs — 1 on Entrepreneur, 2 on Consultant & CA — and after that each regeneration is ₹50 + GST." },
+  { q: "Can I edit the report after it's generated?", a: "Yes. Download the Word and Excel files and edit them freely, or change your inputs on the website and regenerate the report — see below." },
   { q: "How accurate are the financial projections?", a: "The AI builds a complete 5-year model — P&L, cash flow and ratio analysis — based on your inputs and industry benchmarks, rendered as live charts you can verify." },
+  { q: "Can I add my own images to the report?", a: "Yes. Open Edit Details on your report, choose a section and add a picture (JPG or PNG). It is placed at the end of that section in the Word report, at a standard width, with a numbered caption that also appears in the List of Figures. Save it and download the Word file — no regeneration needed. You can also upload your logo and pick a brand colour from Branding." },
+  { q: "Can I regenerate the report with new inputs?", a: "Yes. Open Edit Details to see every figure your model was built from. Change any of them, and/or write in your own words what you want changed — for example “add a monthly revenue table”. Then click Regenerate Report. Leave “Write the Word report too” off to rebuild just the Excel quickly, or tick it to have the written sections rewritten as well (this takes a few minutes)." },
+  { q: "How many regenerations are free, and what does an extra one cost?", a: `Each report includes ${plural(ENT_REGENS, "regeneration")} on Entrepreneur and ${CA_REGENS} on Consultant & CA. After that, each extra regeneration is ₹${REGEN_PRICE} + GST, bought for that report. A regeneration that fails is not counted. Adding the written Word report to a report built as Excel-only also counts as one.` },
+  { q: "Will regenerating change my old report?", a: "Yes — the new version replaces the current one, and earlier versions are not kept, so download a copy first if you want to keep it. Your inserted pictures, logo, brand colour and written instructions stay with the report, and the cover image stays the same." },
+  { q: "Do the Excel numbers change when I regenerate?", a: "Only if you change your figures. If you change nothing, the workbook is rebuilt from the same saved inputs and the numbers come back identical. Instructions written in your own words shape the written report, not the numbers." },
+  { q: "What if something in the report is wrong?", a: "Correct the figure in Edit Details, or describe the fix in your own words, and regenerate. The Word and Excel files are also fully editable after download. If you need help with anything else, contact us." },
+  { q: "Is regeneration available on every plan?", a: `Yes, on every paid plan — ${plural(ENT_REGENS, "regeneration")} per report on Entrepreneur and ${CA_REGENS} on Consultant & CA, then ₹${REGEN_PRICE} + GST each. Reports, and so regenerations, start once you have a plan.` },
 ];
 
 export default function FeaturesPage() {
@@ -328,6 +360,56 @@ function CapabilityVisual({ kind }) {
               <p className="text-sm font-bold">{m.v}</p>
             </div>
           ))}
+        </div>
+      </Frame>
+    );
+  }
+  if (kind === "inserts") {
+    return (
+      <Frame>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="flex-1 rounded-md border bg-muted/40 px-3 py-2 text-sm">4. Plant &amp; Machinery</span>
+            <span className="inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium text-primary">
+              <ImagePlus className="w-4 h-4" /> Add picture
+            </span>
+          </div>
+          {["Figure 3 — Production line, Unit 1", "Figure 4 — Site layout"].map((cap) => (
+            <div key={cap} className="flex items-center gap-3 rounded-xl border bg-muted/30 px-3.5 py-3">
+              <span className="w-14 h-10 rounded-md bg-gradient-to-br from-primary/20 to-emerald-400/20 grid place-items-center">
+                <ImageIcon className="w-5 h-5 text-primary/70" />
+              </span>
+              <p className="text-sm font-medium truncate">{cap}</p>
+            </div>
+          ))}
+        </div>
+      </Frame>
+    );
+  }
+  if (kind === "regen") {
+    return (
+      <Frame>
+        <p className="text-sm font-semibold mb-2">Your figures</p>
+        <div className="space-y-2 mb-4">
+          {[
+            { k: "Average selling price", v: "1,680", edited: true },
+            { k: "Units sold — Year 1", v: "41,668" },
+            { k: "Loan amount", v: "45,00,000" },
+          ].map((f) => (
+            <div key={f.k} className="flex items-center justify-between border-b border-border/60 pb-1.5 text-sm">
+              <span>
+                {f.k}
+                {f.edited && <span className="ml-2 text-xs text-primary font-medium">edited</span>}
+              </span>
+              <span className="font-mono">{f.v}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">1 field changed · workbook only</span>
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-gradient text-white px-3 py-2 text-sm font-medium">
+            <RefreshCw className="w-4 h-4" /> Regenerate Report
+          </span>
         </div>
       </Frame>
     );

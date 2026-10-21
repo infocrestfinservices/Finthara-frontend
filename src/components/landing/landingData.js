@@ -44,6 +44,14 @@ export const STEPS = [
 // set it. Leave "" until it is decided; the box then shows "₹____".
 export const EXTRA_MEMBER_PRICE = "200";
 
+// Regenerations — mirrors services/entitlements.py (REGEN_PRICE and each plan's
+// `free_regenerations`). The website reads them ONLY from here (pricing cards, Features
+// page, FAQ), so a change on the server is one edit here, not a hunt through the copy.
+export const REGEN_PRICE = 50;            // rupees per extra regeneration, GST extra
+export const FREE_REGENERATIONS = { entrepreneur: 1, consultant: 2 };   // per report
+const regenLine = (n) => `${n} regeneration${n === 1 ? "" : "s"} per report`;
+const REGEN_FOOTNOTE = `Extra regenerations: ₹${REGEN_PRICE} + GST each.`;
+
 export const PLANS = [
   {
     id: "entrepreneur",
@@ -58,9 +66,9 @@ export const PLANS = [
       { text: "Online report on the website", included: true },
       { text: "CMA Model & All Bank Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
-      { text: "1 regeneration per report", included: true },
+      { text: regenLine(FREE_REGENERATIONS.entrepreneur), included: true },
     ],
-    footnote: "Extra regenerations: ₹50 + GST each.",
+    footnote: REGEN_FOOTNOTE,
   },
   {
     name: "Consultant & CA",
@@ -86,8 +94,8 @@ export const PLANS = [
       { text: "CMA Model & All Bank Formats", included: true },
       { text: "Investor-Grade Metrics", included: true },
       { text: "2 team seats", included: true },
-      { text: "2 regenerations per report", included: true },
+      { text: regenLine(FREE_REGENERATIONS.consultant), included: true },
     ],
-    footnote: "Extra regenerations: ₹50 + GST each.",
+    footnote: REGEN_FOOTNOTE,
   },
 ];
