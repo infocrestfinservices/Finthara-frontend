@@ -159,8 +159,8 @@ async function streamDownload(projectId, kind) {
   // CORS). If unavailable, derive the extension from the Content-Type so a
   // macro workbook (.xlsm) is never mis-saved as .xlsx — which corrupts it.
   const ct = res.headers.get("Content-Type") || blob.type || "";
-  const fallbackExt = kind !== "excel"
-    ? "docx"
+  const fallbackExt = kind === "pdf" ? "pdf"
+    : kind !== "excel" ? "docx"
     : ct.includes("macroEnabled") ? "xlsm" : "xlsx";
   const name = m ? m[1] : `report.${fallbackExt}`;
 
@@ -174,8 +174,8 @@ async function streamDownload(projectId, kind) {
   URL.revokeObjectURL(url);
 }
 
-async function excelCall(projectId, path, method) {
-  const res = await fetch(`${BACKEND_URL}/generate/${projectId}/excel/${path}`, {
+async function prepareCall(projectId, kind, path, method) {
+  const res = await fetch(`${BACKEND_URL}/generate/${projectId}/${kind}/${path}`, {
     method,
     headers: authHeaders(false),
   });
@@ -189,37 +189,43 @@ async function excelCall(projectId, path, method) {
 }
 
 /**
- * Download the Excel workbook.
+ * Download a file the server builds with LibreOffice — the Excel workbook (template fill +
+ * recalculation) or the PDF (the Word report converted).
  *
- * Building it (template fill + recalculation) can take longer than the ~100 s the hosting
- * platform lets one request run, which ended in a 504. So the server builds it in the
- * background: we ask it to prepare the file, poll until it is ready, then download the
- * finished file — the same workbook, it just no longer has to fit in one request.
+ * That can take longer than the ~100 s the hosting platform lets one request run, which
+ * ended in a 504. So the server builds it in the background: we ask it to prepare the
+ * file, poll until it is ready, then download the finished file — the same file, it just
+ * no longer has to fit in one request.
  */
-export async function downloadExcel(projectId) {
+async function prepareAndDownload(projectId, kind) {
+  const label = kind === "pdf" ? "PDF" : "Excel file";
   let st;
   try {
-    st = await excelCall(projectId, "prepare", "POST");
+    st = await prepareCall(projectId, kind, "prepare", "POST");
   } catch (err) {
     // A backend that predates the background build: download directly, as before.
-    if (err.missingRoute) return streamDownload(projectId, "excel");
+    if (err.missingRoute) return streamDownload(projectId, kind);
     throw err;
   }
   const deadline = Date.now() + 12 * 60 * 1000;
   while (st.status === "running" || st.status === "none") {
     if (Date.now() > deadline) {
-      throw new Error("The Excel file is taking too long to prepare. Please try again.");
+      throw new Error(`The ${label} is taking too long to prepare. Please try again.`);
     }
     await sleep(3000);
-    st = await excelCall(projectId, "status", "GET");
+    st = await prepareCall(projectId, kind, "status", "GET");
     // "none" mid-wait means the server restarted and lost the build — start it again.
-    if (st.status === "none") st = await excelCall(projectId, "prepare", "POST");
+    if (st.status === "none") st = await prepareCall(projectId, kind, "prepare", "POST");
   }
   if (st.status === "failed") {
-    throw new Error(st.error || "The Excel file could not be prepared. Please try again.");
+    throw new Error(st.error || `The ${label} could not be prepared. Please try again.`);
   }
-  return streamDownload(projectId, "excel");
+  return streamDownload(projectId, kind);
 }
+
+export const downloadExcel = (projectId) => prepareAndDownload(projectId, "excel");
+// The Word report as a PDF — same content as the .docx download, converted on the server.
+export const downloadPdf = (projectId) => prepareAndDownload(projectId, "pdf");
 export const downloadWord = (projectId) => streamDownload(projectId, "word");
 
 // Logo + brand colour for this project's report. Stored server-side (in the project's

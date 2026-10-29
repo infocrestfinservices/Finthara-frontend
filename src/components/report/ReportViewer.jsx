@@ -12,11 +12,11 @@ import { ToastAction } from "@/components/ui/toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { reportStorage } from "@/api/localStorageService";
 import { invokeLLM } from "@/api/llmService";
-import { downloadExcel, downloadWord, generateModel, saveBranding, getBranding, fetchCoverImage, getRegenerations } from "@/api/generationService";
+import { downloadExcel, downloadWord, downloadPdf, generateModel, saveBranding, getBranding, fetchCoverImage, getRegenerations } from "@/api/generationService";
 import { verifyOrder } from "@/api/paymentService";
 import BuyRegenerationDialog from "@/components/report/BuyRegenerationDialog";
 import { formatCurrency, purposes } from "@/lib/countryData";
-import { exportToPDF, exportToWord } from "@/lib/exportUtils";
+import { exportToWord } from "@/lib/exportUtils";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import SectionInserts from "@/components/report/SectionInserts";
 
@@ -142,12 +142,13 @@ export default function ReportViewer({ report: initialReport, onBack }) {
   const activeTheme = deriveTheme(report.brand_color, theme);
 
   // Download the backend-generated deliverables (CA-style Word + formula Excel).
-  const [downloading, setDownloading] = useState(null); // 'word' | 'excel' | null
+  const [downloading, setDownloading] = useState(null); // 'word' | 'excel' | 'pdf' | null
   const handleDownload = async (kind) => {
     if (downloading) return;
     setDownloading(kind);
     try {
       if (kind === "word") await downloadWord(report.id);
+      else if (kind === "pdf") await downloadPdf(report.id);
       else await downloadExcel(report.id);
     } catch (err) {
       // 402 means the download is real and ready — the plan just does not include this
@@ -155,7 +156,7 @@ export default function ReportViewer({ report: initialReport, onBack }) {
       // is not, so it gets its own wording and a way to act on it.
       if (err?.needsUpgrade) {
         toast({
-          title: `${kind === "word" ? "Word" : "Excel"} export needs a paid plan`,
+          title: `${{ word: "Word", pdf: "PDF" }[kind] || "Excel"} export needs a paid plan`,
           description: err.message,
           action: (
             <ToastAction altText="See plans" onClick={() => navigate("/pricing")}>
@@ -410,7 +411,9 @@ export default function ReportViewer({ report: initialReport, onBack }) {
     }
   };
 
-  const handleExportPDF = () => { setShowExportMenu(false); exportToPDF(report, activeTheme); };
+  // The PDF is the Word report converted on the server — the same content as the Word
+  // download, not a print of the on-screen narrative.
+  const handleExportPDF = () => { setShowExportMenu(false); handleDownload("pdf"); };
   const handleExportWord = () => { setShowExportMenu(false); exportToWord(report); };
   // Excel must come from the backend template-fill engine (the real sample
   // workbook with the user's data), NOT the old client-side SheetJS builder.
@@ -524,7 +527,7 @@ FORMATTING RULES:
           {/* Export dropdown (PDF / Word) */}
           <div className="relative" ref={exportMenuRef}>
             <Button variant="outline" size="sm" onClick={() => setShowExportMenu(v => !v)} className="gap-2">
-              <Download className="w-4 h-4" />
+              {downloading === "pdf" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               <span className="hidden sm:inline">Export</span>
               <ChevronDown className="w-3 h-3" />
             </Button>

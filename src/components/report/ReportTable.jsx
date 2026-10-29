@@ -7,8 +7,8 @@ import {
   CheckCircle2, Clock, AlertCircle, Zap, ChevronUp, ChevronDown
 } from "lucide-react";
 import { formatCurrency, purposes } from "@/lib/countryData";
-import { exportToPDF, exportToWord } from "@/lib/exportUtils";
-import { downloadExcel } from "@/api/generationService";
+import { exportToWord } from "@/lib/exportUtils";
+import { downloadExcel, downloadPdf } from "@/api/generationService";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
 
@@ -19,7 +19,6 @@ const STATUS_CONFIG = {
   failed: { label: "Failed", icon: AlertCircle, className: "text-red-700 bg-red-50 border-red-200" },
 };
 
-const DEFAULT_THEME = { primary: "#4f46e5", light: "#eef2ff", text: "#3730a3" };
 
 function ActionMenu({ report, onDelete }) {
   const [open, setOpen] = useState(false);
@@ -52,7 +51,14 @@ function ActionMenu({ report, onDelete }) {
           </Link>
           <div className="border-t my-1" />
           <button
-            onClick={() => { setOpen(false); exportToPDF(report, DEFAULT_THEME); }}
+            onClick={async () => {
+              setOpen(false);
+              try {
+                await downloadPdf(report.id);
+              } catch (err) {
+                toast({ title: "Download failed", description: err?.message || "Please try again.", variant: "destructive" });
+              }
+            }}
             className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2.5 transition-colors"
           >
             <Download className="w-4 h-4 text-red-500" /> Download PDF
