@@ -16,7 +16,6 @@ import { downloadExcel, downloadWord, downloadPdf, generateModel, saveBranding, 
 import { verifyOrder } from "@/api/paymentService";
 import BuyRegenerationDialog from "@/components/report/BuyRegenerationDialog";
 import { formatCurrency, purposes } from "@/lib/countryData";
-import { exportToWord } from "@/lib/exportUtils";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import SectionInserts from "@/components/report/SectionInserts";
 
@@ -414,7 +413,8 @@ export default function ReportViewer({ report: initialReport, onBack }) {
   // The PDF is the Word report converted on the server — the same content as the Word
   // download, not a print of the on-screen narrative.
   const handleExportPDF = () => { setShowExportMenu(false); handleDownload("pdf"); };
-  const handleExportWord = () => { setShowExportMenu(false); exportToWord(report); };
+  // The server's Word report — the same file as the toolbar's Word button.
+  const handleExportWord = () => { setShowExportMenu(false); handleDownload("word"); };
   // Excel must come from the backend template-fill engine (the real sample
   // workbook with the user's data), NOT the old client-side SheetJS builder.
   const handleExportExcel = () => { setShowExportMenu(false); handleDownload("excel"); };

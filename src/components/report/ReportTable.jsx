@@ -7,8 +7,7 @@ import {
   CheckCircle2, Clock, AlertCircle, Zap, ChevronUp, ChevronDown
 } from "lucide-react";
 import { formatCurrency, purposes } from "@/lib/countryData";
-import { exportToWord } from "@/lib/exportUtils";
-import { downloadExcel, downloadPdf } from "@/api/generationService";
+import { downloadExcel, downloadPdf, downloadWord } from "@/api/generationService";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
 
@@ -31,6 +30,18 @@ function ActionMenu({ report, onDelete }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // PDF and Excel are built on the server and can take a minute or two, so say so —
+  // otherwise the menu closes and nothing seems to happen.
+  const download = async (fn, label) => {
+    setOpen(false);
+    toast({ title: `Preparing your ${label}…`, description: "The download starts as soon as it is ready." });
+    try {
+      await fn(report.id);
+    } catch (err) {
+      toast({ title: "Download failed", description: err?.message || "Please try again.", variant: "destructive" });
+    }
+  };
+
   const handleDelete = async () => {
     setOpen(false);
     await onDelete(report.id);
@@ -51,33 +62,19 @@ function ActionMenu({ report, onDelete }) {
           </Link>
           <div className="border-t my-1" />
           <button
-            onClick={async () => {
-              setOpen(false);
-              try {
-                await downloadPdf(report.id);
-              } catch (err) {
-                toast({ title: "Download failed", description: err?.message || "Please try again.", variant: "destructive" });
-              }
-            }}
+            onClick={() => download(downloadPdf, "PDF")}
             className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2.5 transition-colors"
           >
             <Download className="w-4 h-4 text-red-500" /> Download PDF
           </button>
           <button
-            onClick={() => { setOpen(false); exportToWord(report); }}
+            onClick={() => download(downloadWord, "Word report")}
             className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2.5 transition-colors"
           >
             <FileType className="w-4 h-4 text-blue-500" /> Download Word
           </button>
           <button
-            onClick={async () => {
-              setOpen(false);
-              try {
-                await downloadExcel(report.id);
-              } catch (err) {
-                toast({ title: "Download failed", description: err?.message || "Please try again.", variant: "destructive" });
-              }
-            }}
+            onClick={() => download(downloadExcel, "Excel file")}
             className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2.5 transition-colors"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-500" /> Download Excel
