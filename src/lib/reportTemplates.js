@@ -61,12 +61,26 @@ export const REPORT_TEMPLATES = [
     icon: "🏨",
     color: "#d97706",
     lightColor: "#fffbeb",
-    description: "Hotels, resorts, restaurants, travel, events",
-    examples: ["Boutique hotel", "Restaurant chain", "Travel agency", "Resort & spa"],
-    contextHint: "This is a hospitality/tourism project. Focus on room count/seating capacity, occupancy rates, average revenue per unit, seasonal demand, staff-to-guest ratio, tourism trends in the area.",
+    description: "Hotels, resorts, homestays, travel, events",
+    examples: ["Boutique hotel", "Resort & spa", "Travel agency", "Homestay"],
+    contextHint: "This is a hospitality/tourism project. Focus on room count, occupancy rates, average room tariff, seasonal demand, staff-to-guest ratio, tourism trends in the area.",
     extraSections: {
-      short: ["Capacity & Occupancy Plan", "Revenue Per Available Room/Cover", "Seasonal Demand Analysis"],
-      long: ["Property Layout & Room/Seating Capacity", "Occupancy Rate Projections", "Revenue Per Available Room (RevPAR)", "Seasonal Demand & Pricing Strategy", "F&B Revenue Plan", "Staff Structure & Training", "Tourism Trends & Catchment Area"]
+      short: ["Capacity & Occupancy Plan", "Revenue Per Available Room", "Seasonal Demand Analysis"],
+      long: ["Property Layout & Room Capacity", "Occupancy Rate Projections", "Revenue Per Available Room (RevPAR)", "Seasonal Demand & Pricing Strategy", "F&B Revenue Plan", "Staff Structure & Training", "Tourism Trends & Catchment Area"]
+    }
+  },
+  {
+    id: "restaurant",
+    label: "Food & Beverage / Restaurant",
+    icon: "🍽️",
+    color: "#dc2626",
+    lightColor: "#fef2f2",
+    description: "Restaurants, cafes, cloud kitchens, bakeries, catering",
+    examples: ["Multicuisine restaurant", "Cafe", "Cloud kitchen", "Restaurant chain"],
+    contextHint: "This is a restaurant / food & beverage project — not a hotel; set industry to exactly \"Food & Beverage / Restaurant\". Focus on number of tables and seats, table turns per day, covers served, average order value, food cost %, kitchen equipment, dine-in vs takeaway/delivery mix, FSSAI and other licences.",
+    extraSections: {
+      short: ["Seating Capacity & Covers Plan", "Average Order Value & Menu Pricing", "Food Cost Control"],
+      long: ["Outlet Layout & Seating Capacity", "Covers & Table-Turn Projections", "Menu Engineering & Average Order Value", "Food Cost & Kitchen Operations", "Dine-in, Takeaway & Delivery Mix", "Staff Structure & Training", "Licences & Food Safety (FSSAI)"]
     }
   },
   {

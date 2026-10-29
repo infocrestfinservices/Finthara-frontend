@@ -56,6 +56,7 @@ export const countries = [
 export const industries = [
   "Agriculture & Farming",
   "Food Processing & Beverages",
+  "Food & Beverage / Restaurant",
   "Textiles & Apparel",
   "Manufacturing & Engineering",
   "Automobile & Auto Components",

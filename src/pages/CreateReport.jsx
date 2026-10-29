@@ -145,6 +145,7 @@ IMPORTANT RULES:
 - Be warm and professional
 - If user gives vague costs (e.g. "around 50 lakhs"), use the number (5000000 for INR)
 - Infer currency from country (India→INR, US→USD, etc.)
+- A restaurant, cafe, dhaba, bakery, cloud kitchen or catering business has industry "Food & Beverage / Restaurant" — never "Tourism & Hospitality", which is for hotels, resorts and travel
 - Keep questions short and direct`;
 
 function buildFinancialFormatInstructions(data, curr) {

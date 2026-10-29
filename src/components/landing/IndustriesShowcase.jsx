@@ -16,7 +16,8 @@ const PHOTO_BY_ID = {
   renewable, healthcare, education, general,
 };
 
-const INDUSTRIES = REPORT_TEMPLATES.map((t) => ({
+// Only cards with a photo appear in the strip (restaurant has none yet).
+const INDUSTRIES = REPORT_TEMPLATES.filter((t) => PHOTO_BY_ID[t.id]).map((t) => ({
   id: t.id,
   label: t.label,
   example: t.examples[0],
