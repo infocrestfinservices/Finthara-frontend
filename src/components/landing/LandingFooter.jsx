@@ -8,17 +8,15 @@ const COLUMNS = [
     links: [
       { label: "Features", to: "/features" },
       { label: "Pricing", to: "/pricing" },
-      { label: "How it works", to: "/how-it-works" },
-      { label: "Create report", to: "/create" },
+      { label: "How It Works", to: "/how-it-works" },
+      { label: "Create Report", to: "/create" },
     ],
   },
   {
     title: "Formats",
     links: [
       { label: "CMA Data", to: "/create" },
-      { label: "SBA / USA", comingSoon: true },
       { label: "Feasibility Study", comingSoon: true },
-      { label: "Investor Pitch", comingSoon: true },
     ],
   },
   {
@@ -66,10 +64,10 @@ export default function LandingFooter() {
                   <li key={l.label}>
                     {l.comingSoon ? (
                       // Only bank loan / CMA is live today — the rest are listed but not linked.
-                      <span className="text-sm text-muted-foreground/70 inline-flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-muted-foreground inline-flex items-center gap-2 whitespace-nowrap">
                         {l.label}
-                        <span className="text-[10px] font-medium uppercase tracking-wide rounded-full border border-border px-1.5 py-0.5">
-                          Coming soon
+                        <span className="text-[10px] font-medium rounded-full border border-blue-400/40 bg-blue-500/10 text-blue-400 px-2 py-0.5">
+                          Coming Soon
                         </span>
                       </span>
                     ) : (
