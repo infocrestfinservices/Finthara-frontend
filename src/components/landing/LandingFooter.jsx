@@ -10,7 +10,7 @@ const COLUMNS = [
       { label: "Pricing", to: "/pricing" },
       { label: "How It Works", to: "/how-it-works" },
       { label: "Create Report", to: "/create" },
-      { label: "Blog", to: "/blog" },
+      { label: "Blogs", to: "/blog" },
     ],
   },
   {
@@ -53,7 +53,7 @@ export default function LandingFooter() {
               in minutes, for Indian and global entrepreneurs.
             </p>
             <p className="mt-4 text-sm font-medium text-foreground max-w-xs leading-relaxed">
-              Product by Infocrest
+              Product by Infocresst
             </p>
           </div>
 

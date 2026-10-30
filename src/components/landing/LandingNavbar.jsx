@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { label: "Features", to: "/features" },
   { label: "How It Works", to: "/how-it-works" },
   { label: "Pricing", to: "/pricing" },
-  { label: "Blog", to: "/blog" },
+  { label: "Blogs", to: "/blog" },
 ];
 
 export default function LandingNavbar() {

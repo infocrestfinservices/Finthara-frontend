@@ -18,6 +18,9 @@
 // Example:
 // {
 //   slug: "what-is-cma-data",              // the URL: finthara.com/blog/what-is-cma-data
+//   category: "Bank Formats",              // one per post — the filter tabs on the list
+//   highlight: "CMA Data",                 // optional — this part of the title shows in blue
+//   author: "Finthara Team",
 //   title: "What Is CMA Data?",
 //   date: "2026-11-01",
 //   tags: ["CMA", "Bank Loan"],
@@ -36,6 +39,9 @@ const L = (...items) => ({ type: "list", items });
 export const BLOG_POSTS = [
   {
     slug: "what-is-a-project-report",
+    category: "Loan Basics",
+    highlight: "Project Report",
+    author: "Finthara Team",
     title: "What Is a Project Report and Why Does Your Bank Ask for One?",
     date: "2026-10-30",
     tags: ["ProjectReport", "BusinessLoan", "MSME", "StartupIndia", "SmallBusiness", "LoanApplication", "Entrepreneurship", "Finthara"],
@@ -61,6 +67,9 @@ export const BLOG_POSTS = [
   },
   {
     slug: "cma-data-explained",
+    category: "Bank Formats",
+    highlight: "CMA Data",
+    author: "Finthara Team",
     title: "CMA Data Explained: The Format Indian Banks Expect",
     date: "2026-11-06",
     tags: ["CMAData", "WorkingCapital", "BankLoan", "MSMEIndia", "CharteredAccountant", "TermLoan", "FinancialPlanning", "Finthara"],
@@ -86,6 +95,9 @@ export const BLOG_POSTS = [
   },
   {
     slug: "dscr-current-ratio-payback",
+    category: "Financial Ratios",
+    highlight: "DSCR",
+    author: "Finthara Team",
     title: "DSCR, Current Ratio and Payback: The Numbers Banks Check Before Saying Yes",
     date: "2026-11-13",
     tags: ["DSCR", "FinancialRatios", "LoanApproval", "BusinessFinance", "MSME", "CreditAnalysis", "SmallBusinessTips", "Finthara"],
@@ -112,6 +124,9 @@ export const BLOG_POSTS = [
   },
   {
     slug: "pmegp-mudra-project-report",
+    category: "Government Schemes",
+    highlight: "PMEGP or Mudra",
+    author: "Finthara Team",
     title: "Applying Under PMEGP or Mudra? Here Is How to Prepare Your Project Report",
     date: "2026-11-20",
     tags: ["PMEGP", "MudraLoan", "CGTMSE", "GovernmentSchemes", "StartupIndia", "MSMESubsidy", "WomenEntrepreneurs", "Finthara"],
@@ -141,6 +156,9 @@ export const BLOG_POSTS = [
   },
   {
     slug: "ai-project-report-preparation",
+    category: "AI in Finance",
+    highlight: "AI",
+    author: "Finthara Team",
     title: "How AI Is Changing Project Report Preparation for Businesses and Consultants",
     date: "2026-11-27",
     tags: ["AIinFinance", "FinTech", "ProjectReport", "CharteredAccountant", "LoanConsultant", "Automation", "MSMEFinance", "Finthara"],
@@ -176,7 +194,15 @@ export const sortedPosts = () =>
 
 export const findPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug && isPublished(p));
 
+// About 200 words a minute, counted over every text block.
+export const readMinutes = (post) => {
+  const words = (post.blocks || [])
+    .flatMap((b) => [b.text, ...(b.items || [])])
+    .join(" ").split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+};
+
 export const formatPostDate = (iso) =>
   iso
-    ? new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
     : "";

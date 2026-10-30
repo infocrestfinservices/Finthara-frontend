@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
-import { findPost, formatPostDate } from "@/lib/blogPosts";
-import { BLOG_NAVY, BLOG_BG, TagPill } from "@/pages/Blog";
+import { findPost, formatPostDate, readMinutes } from "@/lib/blogPosts";
+import { BLOG_NAVY, BLOG_BG, BLOG_INK, SERIF, TagPill } from "@/pages/Blog";
 
 // **bold** inside a paragraph — the only inline formatting the content file supports.
 function richText(text) {
@@ -19,7 +19,7 @@ const IMAGE_WIDTH = { full: "w-full", wide: "w-full sm:w-[85%] mx-auto", half: "
 function Block({ block }) {
   switch (block.type) {
     case "heading":
-      return <h2 className="text-2xl font-heading font-bold text-slate-900 mt-10 mb-3">{block.text}</h2>;
+      return <h2 className="text-[26px] font-semibold mt-11 mb-3 leading-snug" style={{ ...SERIF, color: BLOG_INK }}>{block.text}</h2>;
     case "paragraph":
       return <p className="text-[17px] leading-8 text-slate-700 my-4">{richText(block.text)}</p>;
     case "list":
@@ -54,6 +54,19 @@ function Block({ block }) {
   }
 }
 
+// On the navy band the highlight is the lighter sky blue, so it still stands out.
+function HeroTitle({ post }) {
+  const at = post.highlight ? post.title.indexOf(post.highlight) : -1;
+  if (at < 0) return post.title;
+  return (
+    <>
+      {post.title.slice(0, at)}
+      <span className="text-sky-400">{post.highlight}</span>
+      {post.title.slice(at + post.highlight.length)}
+    </>
+  );
+}
+
 export default function BlogPostPage() {
   const { slug } = useParams();
   const post = findPost(slug);
@@ -74,7 +87,7 @@ export default function BlogPostPage() {
       el.setAttribute("content", content || "");
       return () => (created ? el.remove() : el.setAttribute("content", prev || ""));
     };
-    document.title = `${post.title} | Finthara Blog`;
+    document.title = `${post.title} | Finthara Blogs`;
     const undo = [setMeta("description", post.excerpt), setMeta("keywords", post.keywords)];
     return () => {
       document.title = prevTitle;
@@ -89,19 +102,26 @@ export default function BlogPostPage() {
       <section style={{ backgroundColor: BLOG_NAVY }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
           <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-blue-100/80 hover:text-white">
-            <ArrowLeft className="w-4 h-4" /> All posts
+            <ArrowLeft className="w-4 h-4" /> All Blogs
           </Link>
-          <h1 className="mt-5 text-3xl sm:text-4xl font-heading font-bold tracking-tight text-white leading-tight">
-            {post ? post.title : "Post not found"}
+          {post?.category && (
+            <p className="mt-7 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-400">{post.category}</p>
+          )}
+          <h1 className="mt-3 text-4xl sm:text-5xl font-semibold tracking-tight text-white leading-[1.1]" style={SERIF}>
+            {post ? <HeroTitle post={post} /> : "Post not found"}
           </h1>
-          {post?.date && <p className="mt-4 text-sm text-blue-100/80">{formatPostDate(post.date)}</p>}
+          {post && (
+            <p className="mt-5 text-sm text-blue-100/70">
+              {post.author || "Finthara Team"} · {formatPostDate(post.date)} · {readMinutes(post)} min read
+            </p>
+          )}
         </div>
       </section>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         {!post ? (
           <p className="text-slate-600">
-            This post doesn&apos;t exist. <Link to="/blog" className="text-blue-700 underline">See all posts</Link>.
+            This post doesn&apos;t exist. <Link to="/blog" className="text-blue-700 underline">See all blogs</Link>.
           </p>
         ) : (
           <article>
