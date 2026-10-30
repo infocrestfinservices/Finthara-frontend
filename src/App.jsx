@@ -15,6 +15,8 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import AcceptInvite from '@/pages/AcceptInvite';
 import Contact from '@/pages/Contact';
+import BlogPage from '@/pages/Blog';
+import BlogPostPage from '@/pages/BlogPost';
 import Home from '@/pages/Home';
 import FeaturesPage from '@/pages/Features';
 import HowItWorksPage from '@/pages/HowItWorks';
@@ -73,6 +75,8 @@ const AuthenticatedApp = () => {
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
 
       {/* Authenticated app pages */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>

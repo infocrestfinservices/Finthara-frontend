@@ -8,8 +8,9 @@ import { LogOut, Menu, X, ArrowRight, User as UserIcon } from "lucide-react";
 const NAV_LINKS = [
   { label: "Home", to: "/" },
   { label: "Features", to: "/features" },
-  { label: "How it works", to: "/how-it-works" },
+  { label: "How It Works", to: "/how-it-works" },
   { label: "Pricing", to: "/pricing" },
+  { label: "Blog", to: "/blog" },
 ];
 
 export default function LandingNavbar() {
@@ -83,7 +84,7 @@ export default function LandingNavbar() {
             <>
               <Link to="/create" className="hidden sm:block">
                 <Button size="sm" className="h-9 px-4 gap-1.5">
-                  New report <ArrowRight className="w-4 h-4" />
+                  New Report <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               <Button
@@ -100,12 +101,12 @@ export default function LandingNavbar() {
             <div className="hidden sm:flex items-center gap-2">
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="h-9 px-4">
-                  Log in
+                  Log In
                 </Button>
               </Link>
               <Link to="/register">
                 <Button size="sm" className="h-9 px-4 gap-1.5 shadow-md shadow-primary/20">
-                  Create report <ArrowRight className="w-4 h-4" />
+                  Create Report <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
@@ -162,7 +163,7 @@ export default function LandingNavbar() {
               <>
                 <Link to="/create" className="flex-1">
                   <Button className="w-full gap-1.5">
-                    New report <ArrowRight className="w-4 h-4" />
+                    New Report <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
                 <Button
@@ -177,12 +178,12 @@ export default function LandingNavbar() {
               <>
                 <Link to="/login" className="flex-1">
                   <Button variant="outline" className="w-full">
-                    Log in
+                    Log In
                   </Button>
                 </Link>
                 <Link to="/register" className="flex-1">
                   <Button className="w-full gap-1.5">
-                    Create report <ArrowRight className="w-4 h-4" />
+                    Create Report <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               </>
