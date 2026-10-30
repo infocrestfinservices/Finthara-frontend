@@ -16,9 +16,9 @@ const COLUMNS = [
     title: "Formats",
     links: [
       { label: "CMA Data", to: "/create" },
-      { label: "SBA / USA", to: "/create" },
-      { label: "Feasibility Study", to: "/create" },
-      { label: "Investor Pitch", to: "/create" },
+      { label: "SBA / USA", comingSoon: true },
+      { label: "Feasibility Study", comingSoon: true },
+      { label: "Investor Pitch", comingSoon: true },
     ],
   },
   {
@@ -54,7 +54,7 @@ export default function LandingFooter() {
               in minutes, for Indian and global entrepreneurs.
             </p>
             <p className="mt-4 text-sm font-medium text-foreground max-w-xs leading-relaxed">
-              Product by Infocrest Finweb Private Limited
+              Product by Infocrest
             </p>
           </div>
 
@@ -64,9 +64,19 @@ export default function LandingFooter() {
               <ul className="space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link to={l.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                      {l.label}
-                    </Link>
+                    {l.comingSoon ? (
+                      // Only bank loan / CMA is live today — the rest are listed but not linked.
+                      <span className="text-sm text-muted-foreground/70 inline-flex items-center gap-2 flex-wrap">
+                        {l.label}
+                        <span className="text-[10px] font-medium uppercase tracking-wide rounded-full border border-border px-1.5 py-0.5">
+                          Coming soon
+                        </span>
+                      </span>
+                    ) : (
+                      <Link to={l.to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                        {l.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -76,10 +86,6 @@ export default function LandingFooter() {
 
         <div className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Infocrest Finweb Private Limited. All rights reserved.</p>
-          <p className="inline-flex items-center gap-1.5">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-            All systems operational
-          </p>
         </div>
       </div>
     </footer>

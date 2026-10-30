@@ -831,47 +831,44 @@ FORMATTING RULES:
 
               <ReportRenderer content={report.report_content} theme={activeTheme} />
 
-              {/* The two deliverables. This screen is a summary, not the report — the
-                  report itself is these two files. */}
-              <div className="mt-8 pt-6 border-t grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={() => handleDownload("word")}
-                  disabled={!!downloading}
-                  className="flex items-center gap-3 rounded-xl border-2 border-border hover:border-primary/50 hover:bg-accent/40 px-4 py-4 text-left transition-all disabled:opacity-60"
-                >
-                  <span className="p-2.5 rounded-lg bg-primary/10 text-primary">
-                    {downloading === "word"
-                      ? <Loader2 className="w-5 h-5 animate-spin" />
-                      : <FileText className="w-5 h-5" />}
-                  </span>
-                  <span>
-                    <span className="block font-semibold text-sm">Word Report</span>
-                    <span className="block text-xs text-muted-foreground">
-                      {report.report_format === "short"
-                        ? "3-page overview" : "The full written report"}
+              {/* The deliverables. This screen is a summary, not the report — the
+                  report itself is these files (the PDF is the Word report converted). */}
+              <div className="mt-8 pt-6 border-t grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { kind: "word", Icon: FileText, tint: "bg-primary/10 text-primary",
+                    title: "Word Report",
+                    desc: report.report_format === "short" ? "3-page overview" : "The full written report" },
+                  { kind: "excel", Icon: FileSpreadsheet, tint: "bg-emerald-500/10 text-emerald-600",
+                    title: "Excel Report",
+                    desc: report.report_format === "short"
+                      ? "2 sheets — budget and projections" : "The full financial model" },
+                  { kind: "pdf", Icon: FileText, tint: "bg-red-500/10 text-red-600",
+                    title: "PDF Report", desc: "The Word report as a PDF" },
+                ].map(({ kind, Icon, tint, title, desc }) => (
+                  // The whole card is the click target; the Download pill just makes that
+                  // obvious (a <span>, since a button cannot sit inside a button).
+                  <button
+                    key={kind}
+                    onClick={() => handleDownload(kind)}
+                    disabled={!!downloading}
+                    className="group/dl flex flex-col gap-3 rounded-xl border-2 border-border hover:border-primary/50 hover:bg-accent/40 px-4 py-4 text-left transition-all disabled:opacity-60"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className={`p-2.5 rounded-lg ${tint}`}>
+                        <Icon className="w-5 h-5" />
+                      </span>
+                      <span>
+                        <span className="block font-semibold text-sm">{title}</span>
+                        <span className="block text-xs text-muted-foreground">{desc}</span>
+                      </span>
                     </span>
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => handleDownload("excel")}
-                  disabled={!!downloading}
-                  className="flex items-center gap-3 rounded-xl border-2 border-border hover:border-primary/50 hover:bg-accent/40 px-4 py-4 text-left transition-all disabled:opacity-60"
-                >
-                  <span className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600">
-                    {downloading === "excel"
-                      ? <Loader2 className="w-5 h-5 animate-spin" />
-                      : <FileSpreadsheet className="w-5 h-5" />}
-                  </span>
-                  <span>
-                    <span className="block font-semibold text-sm">Excel Report</span>
-                    <span className="block text-xs text-muted-foreground">
-                      {report.report_format === "short"
-                        ? "2 sheets — budget and projections"
-                        : "The full financial model"}
+                    <span className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium h-9 px-4 group-hover/dl:bg-primary/90 transition-colors">
+                      {downloading === kind
+                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</>
+                        : <><Download className="w-4 h-4" /> Download</>}
                     </span>
-                  </span>
-                </button>
+                  </button>
+                ))}
               </div>
             </div>
           )}
