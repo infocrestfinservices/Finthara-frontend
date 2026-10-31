@@ -26,10 +26,11 @@ import {
 import {
   Users, CreditCard, FileText, ArrowLeft, Loader2, AlertCircle, Search, Tag, Plus,
   LayoutDashboard, Crown, LogOut, RefreshCw, ShieldCheck, Repeat, Receipt,
-  ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
+  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Newspaper,
 } from "lucide-react";
 import DashboardTab from "@/components/admin/DashboardTab";
 import RolesTab from "@/components/admin/RolesTab";
+import BlogsTab from "@/components/admin/BlogsTab";
 import {
   getStats, getIndustries, getUsers, getPayments, getProjects, setUserPlan,
   getCoupons, createCoupon, setCouponActive, getRepeatBuyers, getAdminInvoices,
@@ -236,6 +237,7 @@ export default function Admin() {
           {section === "projects" ? <ProjectsTab industries={industries} /> : null}
           {section === "coupons" ? <CouponsTab toast={toast} /> : null}
           {section === "roles" ? <RolesTab toast={toast} /> : null}
+          {section === "blogs" ? <BlogsTab toast={toast} /> : null}
         </div>
       </main>
     </div>
@@ -257,6 +259,8 @@ const SECTIONS = [
     hint: "Discount codes and what is left of them" },
   { id: "roles", label: "Roles", icon: ShieldCheck,
     hint: "Who can get into this console" },
+  { id: "blogs", label: "Blogs", icon: Newspaper,
+    hint: "Write, edit and publish the posts on /blog" },
 ];
 
 function Sidebar({ section, onSelect, onLogout }) {

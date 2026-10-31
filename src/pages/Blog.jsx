@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
-import { sortedPosts, formatPostDate, readMinutes } from "@/lib/blogPosts";
+import { formatPostDate, readMinutes } from "@/lib/blogPosts";
+import { listPosts, blogImageUrl } from "@/api/blogService";
 
 // The blog keeps its own fixed palette (navy band over a pale blue-grey page) in both
 // light and dark mode, so its colours are set here rather than from the theme tokens.
@@ -26,9 +27,9 @@ export function PostTitle({ post }) {
 }
 
 /** "LOAN BASICS · OCT 30, 2026" */
-export function PostEyebrow({ post }) {
+export function PostEyebrow({ post, small = false }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.14em]">
+    <p className={`${small ? "text-[10px] tracking-[0.12em]" : "text-[11px] tracking-[0.14em]"} font-semibold uppercase`}>
       {post.category && <span style={{ color: BLOG_ACCENT }}>{post.category}</span>}
       {post.category && <span className="text-slate-300 mx-2">·</span>}
       <span className="text-slate-400">{formatPostDate(post.date)}</span>
@@ -55,7 +56,7 @@ function FeaturedCard({ post }) {
       {/* The covers carry their own text, so they are shown whole (never cropped) and
           centred on a matching pale panel when the text column is taller. */}
       <Link to={`/blog/${post.slug}`} className="flex items-center bg-[#F4F8FC]">
-        {post.cover && <img src={post.cover} alt="" className="w-full aspect-[1200/630] object-cover" />}
+        {post.cover_image_id && <img src={blogImageUrl(post.cover_image_id)} alt="" className="w-full aspect-[1200/630] object-cover" />}
       </Link>
       <div className="p-6 sm:p-9 flex flex-col justify-center">
         <PostEyebrow post={post} />
@@ -72,19 +73,19 @@ function FeaturedCard({ post }) {
 function PostCard({ post }) {
   return (
     <article className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col">
-      {post.cover && (
+      {post.cover_image_id && (
         <Link to={`/blog/${post.slug}`} className="block bg-slate-100">
-          <img src={post.cover} alt="" className="w-full aspect-[1200/630] object-cover" />
+          <img src={blogImageUrl(post.cover_image_id)} alt="" loading="lazy" className="w-full aspect-[1200/630] object-cover" />
         </Link>
       )}
-      <div className="p-5 flex flex-col flex-1">
-        <PostEyebrow post={post} />
-        <h3 className="mt-2.5 text-xl leading-snug font-semibold" style={{ ...SERIF, color: BLOG_INK }}>
+      <div className="p-4 flex flex-col flex-1">
+        <PostEyebrow post={post} small />
+        <h3 className="mt-2 text-[17px] leading-snug font-semibold" style={{ ...SERIF, color: BLOG_INK }}>
           <Link to={`/blog/${post.slug}`} className="hover:opacity-85"><PostTitle post={post} /></Link>
         </h3>
-        {post.excerpt && <p className="mt-2 text-sm leading-relaxed text-slate-500">{post.excerpt}</p>}
-        <div className="mt-auto pt-5">
-          <p className="pt-3 border-t border-slate-100 text-xs text-slate-400">{byline(post)}</p>
+        {post.excerpt && <p className="mt-1.5 text-[13px] leading-relaxed text-slate-500 line-clamp-3">{post.excerpt}</p>}
+        <div className="mt-auto pt-4">
+          <p className="pt-2.5 border-t border-slate-100 text-[11px] text-slate-400">{byline(post)}</p>
         </div>
       </div>
     </article>
@@ -95,9 +96,14 @@ export default function BlogPage() {
   const [params] = useSearchParams();
   const tag = params.get("tag");
   const category = params.get("category");
-  const all = sortedPosts();
-  const categories = [...new Set(all.map((p) => p.category).filter(Boolean))];
-  const posts = all.filter((p) =>
+  const [all, setAll] = useState(null);       // null while loading
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    listPosts().then(setAll).catch(() => { setAll([]); setFailed(true); });
+  }, []);
+  const loaded = all || [];
+  const categories = [...new Set(loaded.map((p) => p.category).filter(Boolean))];
+  const posts = loaded.filter((p) =>
     (!category || p.category === category) && (!tag || (p.tags || []).includes(tag)));
   const filtered = Boolean(category || tag);
   const [featured, ...rest] = posts;
@@ -124,9 +130,9 @@ export default function BlogPage() {
             </p>
           </div>
           <div className="flex items-end gap-3 shrink-0">
-            <span className="text-6xl sm:text-7xl leading-none text-white" style={SERIF}>{all.length}</span>
+            <span className="text-6xl sm:text-7xl leading-none text-white" style={SERIF}>{all ? all.length : "–"}</span>
             <span className="pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-100/70">
-              {all.length === 1 ? "Article" : "Articles"}
+              {all?.length === 1 ? "Article" : "Articles"}
             </span>
           </div>
         </div>
@@ -149,15 +155,18 @@ export default function BlogPage() {
           </p>
         )}
 
-        {posts.length === 0 ? (
+        {all === null ? (
+          <p className="text-center text-slate-400 py-20">Loading…</p>
+        ) : posts.length === 0 ? (
           <p className="text-center text-slate-500 py-20">
-            {filtered ? "No posts here yet." : "Posts are coming soon."}
+            {failed ? "Could not load the blogs — please refresh the page."
+              : filtered ? "No posts here yet." : "Posts are coming soon."}
           </p>
         ) : (
           <>
             <div className="mt-8"><FeaturedCard post={featured} /></div>
             {rest.length > 0 && (
-              <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {rest.map((p) => <PostCard key={p.slug} post={p} />)}
               </div>
             )}

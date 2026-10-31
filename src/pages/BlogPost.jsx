@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
-import { findPost, formatPostDate, readMinutes } from "@/lib/blogPosts";
+import { formatPostDate, readMinutes } from "@/lib/blogPosts";
+import { getPost, blogImageUrl } from "@/api/blogService";
 import { BLOG_NAVY, BLOG_BG, BLOG_INK, SERIF, TagPill } from "@/pages/Blog";
 
 // **bold** inside a paragraph — the only inline formatting the content file supports.
@@ -31,7 +32,7 @@ function Block({ block }) {
     case "image":
       return (
         <figure className={`my-8 ${IMAGE_WIDTH[block.size] || IMAGE_WIDTH.full}`}>
-          <img src={block.src} alt={block.alt || ""} className="w-full rounded-xl border border-slate-200" />
+          <img src={block.image_id ? blogImageUrl(block.image_id) : block.src} alt={block.alt || ""} className="w-full rounded-xl border border-slate-200" />
           {block.caption && (
             <figcaption className="mt-2 text-center text-sm text-slate-500">{block.caption}</figcaption>
           )}
@@ -54,6 +55,23 @@ function Block({ block }) {
   }
 }
 
+/** The post body — also used by the admin editor as its live preview. */
+export function PostArticle({ post }) {
+  return (
+    <article>
+      {post.cover_image_id && (
+        <img src={blogImageUrl(post.cover_image_id)} alt="" className="w-full rounded-2xl border border-slate-200 mb-6" />
+      )}
+      {(post.blocks || []).map((b, i) => <Block key={i} block={b} />)}
+      {post.tags?.length > 0 && (
+        <div className="mt-10 pt-6 border-t border-slate-200 flex flex-wrap gap-2">
+          {post.tags.map((t) => <TagPill key={t} tag={t} />)}
+        </div>
+      )}
+    </article>
+  );
+}
+
 // On the navy band the highlight is the lighter sky blue, so it still stands out.
 function HeroTitle({ post }) {
   const at = post.highlight ? post.title.indexOf(post.highlight) : -1;
@@ -69,7 +87,11 @@ function HeroTitle({ post }) {
 
 export default function BlogPostPage() {
   const { slug } = useParams();
-  const post = findPost(slug);
+  const [post, setPost] = useState(undefined);   // undefined while loading, null if missing
+  useEffect(() => {
+    setPost(undefined);
+    getPost(slug).then(setPost).catch(() => setPost(null));
+  }, [slug]);
 
   // Title, description and keywords for search engines and link previews; put back on leave.
   useEffect(() => {
@@ -108,7 +130,7 @@ export default function BlogPostPage() {
             <p className="mt-7 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-400">{post.category}</p>
           )}
           <h1 className="mt-3 text-4xl sm:text-5xl font-semibold tracking-tight text-white leading-[1.1]" style={SERIF}>
-            {post ? <HeroTitle post={post} /> : "Post not found"}
+            {post ? <HeroTitle post={post} /> : post === null ? "Post not found" : " "}
           </h1>
           {post && (
             <p className="mt-5 text-sm text-blue-100/70">
@@ -119,22 +141,14 @@ export default function BlogPostPage() {
       </section>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        {!post ? (
+        {post === undefined ? (
+          <p className="text-slate-400">Loading…</p>
+        ) : !post ? (
           <p className="text-slate-600">
             This post doesn&apos;t exist. <Link to="/blog" className="text-blue-700 underline">See all blogs</Link>.
           </p>
         ) : (
-          <article>
-            {post.cover && (
-              <img src={post.cover} alt="" className="w-full rounded-2xl border border-slate-200 mb-6" />
-            )}
-            {(post.blocks || []).map((b, i) => <Block key={i} block={b} />)}
-            {post.tags?.length > 0 && (
-              <div className="mt-10 pt-6 border-t border-slate-200 flex flex-wrap gap-2">
-                {post.tags.map((t) => <TagPill key={t} tag={t} />)}
-              </div>
-            )}
-          </article>
+          <PostArticle post={post} />
         )}
       </main>
 
