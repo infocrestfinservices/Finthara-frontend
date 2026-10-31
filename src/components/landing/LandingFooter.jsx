@@ -17,7 +17,7 @@ const COLUMNS = [
     title: "Formats",
     links: [
       { label: "CMA Data", to: "/create" },
-      { label: "Feasibility Study", comingSoon: true },
+      { label: "Feasibility Study", to: "/create?purpose=feasibility_study" },
     ],
   },
   {

@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { reportStorage } from "@/api/localStorageService";
 import { invokeLLM } from "@/api/llmService";
 import { generateModel } from "@/api/generationService";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, Loader2, FileText, Bot, User, Sparkles, Copy, Pencil, Check } from "lucide-react";
+import { ArrowLeft, Send, Loader2, FileText, Bot, User, Sparkles, Copy, Pencil, Check, Landmark, ClipboardCheck } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import TemplateSelector from "@/components/report/TemplateSelector";
 import TemplateInputForm from "@/components/report/TemplateInputForm";
+import { FEASIBILITY_SYSTEM_PROMPT } from "@/lib/feasibilityPrompt";
 
 const SYSTEM_PROMPT = `You are a friendly project report assistant. Your job is to gather information from the user to create a professional project report.
 
@@ -518,6 +519,14 @@ function readControlBlock(response) {
 
 export default function CreateReport() {
   const navigate = useNavigate();
+  // /create with no purpose shows the report-type chooser first. Picking one adds
+  // ?purpose=… (a history entry, so Back returns to the chooser):
+  // feasibility_study runs the feasibility chat; anything else is the bank-loan chat
+  // exactly as before.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const purposeParam = searchParams.get("purpose");
+  const isFeasibility = purposeParam === "feasibility_study";
+  const systemPrompt = isFeasibility ? FEASIBILITY_SYSTEM_PROMPT : SYSTEM_PROMPT;
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -572,7 +581,7 @@ export default function CreateReport() {
       const templateContext = selectedTemplate ? `\nTEMPLATE CONTEXT: ${selectedTemplate.contextHint}\n` : "";
 
       const response = await invokeLLM({
-        prompt: `${SYSTEM_PROMPT}${templateContext}\n\n---CONVERSATION SO FAR---\n${conversationHistory}\n\nAssistant:`,
+        prompt: `${systemPrompt}${templateContext}\n\n---CONVERSATION SO FAR---\n${conversationHistory}\n\nAssistant:`,
         model: "claude_sonnet_4_6"
       });
 
@@ -580,6 +589,12 @@ export default function CreateReport() {
       // user — fenced or bare, it is read out and stripped from the visible reply.
       const { parsed, visible } = readControlBlock(response);
       if (parsed?.ready && parsed?.data) {
+        if (isFeasibility) {
+          // Whatever the model wrote, this chat is a feasibility study: the purpose picks
+          // the Feasibility workbook, and "cma_india" would fold it onto the CMA purpose.
+          parsed.data.purpose = "feasibility_study";
+          parsed.data.financial_format = "standard";
+        }
         setCollectedData(parsed.data);
         setMessages(prev => [...prev, {
           role: "assistant",
@@ -620,7 +635,9 @@ export default function CreateReport() {
     "Studying your market and who you would be competing with…",
     "Working out what the project would cost to set up…",
     "Building your financial model…",
-    "Putting the CMA figures together the way your bank reads them…",
+    isFeasibility
+      ? "Working out break-even, loan repayment and the five-year projections…"
+      : "Putting the CMA figures together the way your bank reads them…",
     "Writing your report…",
     "Assembling the workbook…",
   ];
@@ -769,7 +786,21 @@ export default function CreateReport() {
     }
   };
 
-  if (!selectedTemplate) {
+  if (!purposeParam) {
+    const reportTypes = [
+      {
+        purpose: "bank_loan",
+        icon: Landmark,
+        title: "Bank Loan / CMA Report",
+        text: "For a bank submission: CMA data, DSCR, term loan and working capital.",
+      },
+      {
+        purpose: "feasibility_study",
+        icon: ClipboardCheck,
+        title: "Feasibility Study",
+        text: "Is the project viable? Profitability, break-even, sensitivity and a clear verdict.",
+      },
+    ];
     return (
       <div className="min-h-screen bg-background">
         <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
@@ -780,6 +811,54 @@ export default function CreateReport() {
               </Button>
             </Link>
             <p className="text-sm font-semibold">New Report</p>
+          </div>
+        </header>
+        <div className="max-w-3xl mx-auto px-4 py-10">
+          <h1 className="text-2xl font-bold text-center">What report do you need?</h1>
+          <p className="text-sm text-muted-foreground text-center mt-2">
+            Choose one — the assistant will ask only the questions for that report.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 mt-8">
+            {reportTypes.map(({ purpose, icon: Icon, title, text }) => (
+              <button
+                key={purpose}
+                type="button"
+                onClick={() => {
+                  // Back from a chat lands here with that chat still in state; start clean.
+                  setSelectedTemplate(null);
+                  setMessages([]);
+                  setInput("");
+                  setCollectedData(null);
+                  setPendingData(null);
+                  setShowInputs(false);
+                  setSearchParams({ purpose });
+                }}
+                className="text-left rounded-xl border bg-card p-6 hover:border-primary hover:shadow-md transition"
+              >
+                <div className="p-2 rounded-lg bg-primary text-primary-foreground w-fit">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <p className="font-semibold mt-4">{title}</p>
+                <p className="text-sm text-muted-foreground mt-1">{text}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedTemplate) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+            <Link to="/">
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </Link>
+            <p className="text-sm font-semibold">{isFeasibility ? "New Feasibility Study" : "New Report"}</p>
           </div>
         </header>
         <TemplateSelector onSelect={handleTemplateSelect} />
