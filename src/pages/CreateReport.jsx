@@ -9,6 +9,7 @@ import { ArrowLeft, Send, Loader2, FileText, Bot, User, Sparkles, Copy, Pencil, 
 import ReactMarkdown from "react-markdown";
 import TemplateSelector from "@/components/report/TemplateSelector";
 import TemplateInputForm from "@/components/report/TemplateInputForm";
+import VoiceInputButton from "@/components/report/VoiceInputButton";
 import { FEASIBILITY_SYSTEM_PROMPT } from "@/lib/feasibilityPrompt";
 
 const SYSTEM_PROMPT = `You are a friendly project report assistant. Your job is to gather information from the user to create a professional project report.
@@ -1060,6 +1061,7 @@ export default function CreateReport() {
             rows={1}
             disabled={isThinking || isGenerating}
           />
+          <VoiceInputButton value={input} onChange={setInput} disabled={isThinking || isGenerating} />
           <Button
             onClick={sendMessage}
             disabled={!input.trim() || isThinking || isGenerating}
@@ -1069,7 +1071,7 @@ export default function CreateReport() {
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-center text-xs text-muted-foreground mt-2">Press Enter to send · Shift+Enter for new line</p>
+        <p className="text-center text-xs text-muted-foreground mt-2">Press Enter to send · Shift+Enter for new line · Tap the mic to speak</p>
       </div>
     </div>
   );
