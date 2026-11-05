@@ -15,7 +15,7 @@ const LANGS = [
   { code: "hi-IN", label: "हि" },
 ];
 
-export default function VoiceInputButton({ value, onChange, disabled }) {
+export default function VoiceInputButton({ value, onChange, disabled, onListeningChange }) {
   const { toast } = useToast();
   const [listening, setListening] = useState(false);
   const [lang, setLang] = useState("en-IN");
@@ -29,6 +29,9 @@ export default function VoiceInputButton({ value, onChange, disabled }) {
   };
 
   useEffect(() => () => recRef.current?.abort(), []);
+  useEffect(() => {
+    onListeningChange?.(listening);
+  }, [listening]);
   useEffect(() => {
     if (disabled && recRef.current) stop();
   }, [disabled]);

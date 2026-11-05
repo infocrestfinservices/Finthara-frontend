@@ -1,6 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Linkedin } from "lucide-react";
 import Logo from "@/components/Logo";
+
+// Shown at the right of the footer's bottom bar. Add further profiles here as they go live.
+const SOCIAL = [
+  { label: "Finthara on LinkedIn", href: "https://www.linkedin.com/company/finthara/", Icon: Linkedin },
+];
 
 const COLUMNS = [
   {
@@ -85,6 +91,21 @@ export default function LandingFooter() {
 
         <div className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Infocrest Finweb Private Limited. All rights reserved.</p>
+          <div className="flex items-center gap-3">
+            {SOCIAL.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                title={label}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border hover:text-foreground hover:border-foreground/40 transition-colors"
+              >
+                <Icon className="h-4 w-4" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

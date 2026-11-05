@@ -136,6 +136,10 @@ export default function ReportViewer({ report: initialReport, onBack }) {
   const logoInputRef = useRef(null);
 
   const purposeLabel = purposes.find(p => p.value === report.purpose)?.label || report.purpose;
+  // A feasibility study is not a bank submission; every other purpose keeps its label.
+  const longLabel = report.purpose === "feasibility_study"
+    ? "Long — full feasibility study"
+    : "Long — bank submission";
   // Everything in the document is painted from this, so a brand colour reaches the
   // headings, tables and stat bar — not just the header band.
   const activeTheme = deriveTheme(report.brand_color, theme);
@@ -669,7 +673,7 @@ FORMATTING RULES:
               {[
                 { key: "short", label: "Short — overview",
                   hint: "3-page Word + 2-sheet Excel" },
-                { key: "long", label: "Long — bank submission",
+                { key: "long", label: longLabel,
                   hint: "Full report + full Excel model" },
               ].map((opt) => {
                 const active = (report.report_format || "long") === opt.key;
@@ -763,7 +767,7 @@ FORMATTING RULES:
             )}
             <div>
               <p className="text-white/70 text-xs font-medium uppercase tracking-wider">Project Report</p>
-              <p className="text-white/60 text-xs">{report.report_format === "short" ? "Short — overview" : "Long — bank submission"} · {purposeLabel}</p>
+              <p className="text-white/60 text-xs">{report.report_format === "short" ? "Short — overview" : longLabel} · {purposeLabel}</p>
             </div>
           </div>
           <h1 className="text-2xl sm:text-3xl font-heading font-bold text-white leading-tight">{report.title}</h1>

@@ -16,12 +16,21 @@ const SYSTEM_PROMPT = `You are a friendly project report assistant. Your job is 
 
 CONVERSATION FLOW — follow this ORDER exactly. Ask ONE question per message, warm and short.
 
-STEP 1 — the business (ask only what you do not already know):
-   - Project/business title and what it does
-   - Country and city/location
+STEP 1 — the business (ask only what you do not already know), in this order:
+   - The promoter's name
+   - The company/business name
+   - The city where the business is, or will be. NEVER ask the country — see INDIA ONLY.
+   - What the business does
    - Industry/sector
-   - Promoter/company name and their experience
    - Target market and customers
+   Do NOT ask about the promoter's experience. If they mention it on their own, store it in
+   promoter_experience; otherwise leave promoter_experience as "".
+
+INDIA ONLY — we currently prepare reports only for businesses in India. Always set
+"country": "India" and "currency": "INR". If the user says the business is in, or gives a
+city of, any other country, do not go on with that location; reply warmly with: "Currently
+we prepare CMA / Feasibility reports only for businesses in India. Could you share the
+Indian city where this business will be?" and continue only once they give a city in India.
 
 STEP 2 — as soon as you have the target market, ask THIS, before any money question:
 
@@ -533,6 +542,7 @@ export default function CreateReport() {
   const [input, setInput] = useState("");
   const [copiedIdx, setCopiedIdx] = useState(null);
   const [isThinking, setIsThinking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStep, setGeneratingStep] = useState(0);
   const [elapsed, setElapsed] = useState(0);
@@ -590,6 +600,9 @@ export default function CreateReport() {
       // user — fenced or bare, it is read out and stripped from the visible reply.
       const { parsed, visible } = readControlBlock(response);
       if (parsed?.ready && parsed?.data) {
+        // Reports are India-only for now; the chat never asks the country.
+        parsed.data.country = "India";
+        parsed.data.currency = "INR";
         if (isFeasibility) {
           // Whatever the model wrote, this chat is a feasibility study: the purpose picks
           // the Feasibility workbook, and "cma_india" would fold it onto the CMA purpose.
@@ -1056,12 +1069,17 @@ export default function CreateReport() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Describe your business idea or answer the question above..."
+            placeholder={isListening ? "Listening… speak now" : "Describe your business idea or answer the question above..."}
             className="resize-none min-h-[44px] max-h-32 text-sm"
             rows={1}
             disabled={isThinking || isGenerating}
           />
-          <VoiceInputButton value={input} onChange={setInput} disabled={isThinking || isGenerating} />
+          <VoiceInputButton
+            value={input}
+            onChange={setInput}
+            disabled={isThinking || isGenerating}
+            onListeningChange={setIsListening}
+          />
           <Button
             onClick={sendMessage}
             disabled={!input.trim() || isThinking || isGenerating}
@@ -1071,7 +1089,14 @@ export default function CreateReport() {
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-center text-xs text-muted-foreground mt-2">Press Enter to send · Shift+Enter for new line · Tap the mic to speak</p>
+        {isListening ? (
+          <p className="text-center text-xs font-medium text-red-600 mt-2 flex items-center justify-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+            Listening… speak now · tap the mic again to stop
+          </p>
+        ) : (
+          <p className="text-center text-xs text-muted-foreground mt-2">Press Enter to send · Shift+Enter for new line · Tap the mic to speak</p>
+        )}
       </div>
     </div>
   );
