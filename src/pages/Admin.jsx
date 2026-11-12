@@ -829,11 +829,16 @@ function ProjectsTab({ industries }) {
  *  changing a plan, and every code shows how much of it is left. */
 function CouponsTab({ toast }) {
   const [rows, setRows] = useState(null);
+  const [plans, setPlans] = useState([]);   // [{key, label, amount}] — what a code can be for
   const [open, setOpen] = useState(false);
 
   const load = useCallback(async () => {
     setRows(null);
-    try { setRows((await getCoupons()).coupons); } catch { setRows([]); }
+    try {
+      const r = await getCoupons();
+      setRows(r.coupons);
+      setPlans(r.plans || []);
+    } catch { setRows([]); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -873,7 +878,9 @@ function CouponsTab({ toast }) {
                 {cpn.kind === "percent" ? `${cpn.value}%` : money(cpn.value)}
               </td>
               <td className="px-4 py-3 text-muted-foreground">
-                {cpn.applies_to?.length ? cpn.applies_to.join(", ") : "all paid plans"}
+                {cpn.applies_to?.length
+                  ? (cpn.applies_to_labels || cpn.applies_to).join(", ")
+                  : <span className="text-amber-400">all paid plans (old code)</span>}
               </td>
               <td className="px-4 py-3 text-muted-foreground">
                 {cpn.used_count}{cpn.max_redemptions ? ` / ${cpn.max_redemptions}` : ""}
@@ -903,6 +910,7 @@ function CouponsTab({ toast }) {
 
       <NewCouponDialog
         open={open}
+        plans={plans}
         onClose={() => setOpen(false)}
         onCreated={(code) => { toast({ title: "Coupon created", description: code }); load(); }}
       />
@@ -910,10 +918,10 @@ function CouponsTab({ toast }) {
   );
 }
 
-function NewCouponDialog({ open, onClose, onCreated }) {
+function NewCouponDialog({ open, plans, onClose, onCreated }) {
   const blank = {
     code: "", kind: "percent", value: "", description: "",
-    applies_to: "", max_redemptions: "", per_user_limit: "1", valid_until: "",
+    applies_to: [], max_redemptions: "", per_user_limit: "1", valid_until: "",
   };
   const [f, setF] = useState(blank);
   const [saving, setSaving] = useState(false);
@@ -921,8 +929,18 @@ function NewCouponDialog({ open, onClose, onCreated }) {
   useEffect(() => { if (open) { setF(blank); setErr(""); } }, [open]);   // eslint-disable-line
 
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
+  // Plans on sale grouped the way customers see them on the pricing page:
+  // "Consultant & CA (Monthly)" and "(Yearly)" are one choice, covering both billing periods.
+  const groups = Object.values(plans.reduce((acc, p) => {
+    const name = p.label.replace(/\s*\(.*\)\s*$/, "");
+    const g = acc[name] || (acc[name] = { name, keys: [], parts: [] });
+    g.keys.push(p.key);
+    g.parts.push(`${(p.label.match(/\((.*)\)/) || [])[1] || "One-time"} ${money(p.amount)}`);
+    return acc;
+  }, {})).map((g) => ({ ...g, sub: g.parts.join(" · ") }));
 
   const save = async () => {
+    if (!f.applies_to.length) { setErr("Choose the plan this coupon is for."); return; }
     setSaving(true); setErr("");
     try {
       const r = await createCoupon({
@@ -930,7 +948,7 @@ function NewCouponDialog({ open, onClose, onCreated }) {
         kind: f.kind,
         value: Number(f.value),
         description: f.description || null,
-        applies_to: f.applies_to ? f.applies_to.split(",").map((x) => x.trim()) : null,
+        applies_to: f.applies_to,
         max_redemptions: f.max_redemptions === "" ? null : Number(f.max_redemptions),
         per_user_limit: f.per_user_limit === "" ? null : Number(f.per_user_limit),
         valid_until: f.valid_until ? new Date(f.valid_until).toISOString() : null,
@@ -981,9 +999,30 @@ function NewCouponDialog({ open, onClose, onCreated }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Applies to</Label>
-            <Input placeholder="Blank for all paid plans, or e.g. entrepreneur, consultant_monthly"
-                   value={f.applies_to} onChange={set("applies_to")} />
+            <Label>Which plan is this coupon for? <span className="text-destructive">*</span></Label>
+            {groups.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Loading plans…</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {groups.map((g) => {
+                  const on = g.keys.length === f.applies_to.length
+                    && g.keys.every((k) => f.applies_to.includes(k));
+                  return (
+                    <button key={g.name} type="button"
+                            onClick={() => setF((p) => ({ ...p, applies_to: g.keys }))}
+                            className={`rounded-md border p-3 text-left text-sm transition ${on
+                              ? "border-primary bg-primary/10 text-foreground"
+                              : "border-border text-muted-foreground hover:bg-muted/40"}`}>
+                      <div className="font-medium text-foreground">{g.name}</div>
+                      <div className="text-xs">{g.sub}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              The code will work only on the plan chosen here; any other plan rejects it.
+            </p>
           </div>
 
           <div className="grid grid-cols-3 gap-3">

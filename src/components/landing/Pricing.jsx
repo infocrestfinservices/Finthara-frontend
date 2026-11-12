@@ -455,6 +455,12 @@ function CheckoutDialog({ option, cashfree, gstConfig, planAmounts, paypal, onCl
                         {couponState.message}
                       </p>
                     )}
+                    {couponState?.valid && couponState.valid_for && (
+                      <p className="text-xs text-muted-foreground">
+                        This coupon code is valid for the <span className="font-medium text-foreground">
+                        {couponState.valid_for}</span> plan only.
+                      </p>
+                    )}
                   </div>
                 )}
 
