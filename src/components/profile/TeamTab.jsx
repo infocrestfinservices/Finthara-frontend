@@ -164,7 +164,7 @@ function OwnerTeamCard({ team, audit, onChange }) {
 
         <div className="flex flex-col sm:flex-row gap-2 mb-5">
           <Input
-            type="email" placeholder="teammate@company.com" value={email}
+            type="email" placeholder="Enter teammate's email" value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && invite()}
             disabled={seatsFull}
