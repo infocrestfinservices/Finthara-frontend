@@ -34,6 +34,7 @@ import BlogsTab from "@/components/admin/BlogsTab";
 import {
   getStats, getIndustries, getUsers, getPayments, getProjects, setUserPlan,
   getCoupons, createCoupon, setCouponActive, getRepeatBuyers, getAdminInvoices,
+  purgeUnverified,
 } from "@/api/adminService";
 
 // Legacy basic/advanced stay listed so staff can still see and fix accounts on them.
@@ -345,18 +346,37 @@ function UsersTab({ toast }) {
   const [q, setQ] = useState("");
   const [plan, setPlan] = useState("");
   const [editing, setEditing] = useState(null);
+  // Unverified sign-ups are almost all bots (random names, dotted Gmail addresses), so
+  // they are hidden by default and can be cleared in one go.
+  const [hideUnverified, setHideUnverified] = useState(true);
+  const [unverified, setUnverified] = useState(0);
+  const [purging, setPurging] = useState(false);
 
   // Filtered on the plan IN FORCE, not the column — a lapsed monthly plan belongs under
   // Free, which is what "who is on the free tier" actually means.
-  const load = useCallback(async (search = q, planFilter = plan) => {
+  const load = useCallback(async (search = q, planFilter = plan, hide = hideUnverified) => {
     setRows(null);
     try {
-      const d = await getUsers({ q: search, plan: planFilter, limit: 200 });
-      setRows(d.users); setTotal(d.total);
+      const d = await getUsers({ q: search, plan: planFilter, limit: 200,
+                                 verified: hide ? true : undefined });
+      setRows(d.users); setTotal(d.total); setUnverified(d.unverified_total || 0);
     } catch {
       setRows([]);
     }
-  }, [q, plan]);
+  }, [q, plan, hideUnverified]);
+
+  const purge = async () => {
+    if (!window.confirm("Delete every unverified account older than 24 hours? "
+                        + "Real users verify within minutes; these are almost all bots.")) return;
+    setPurging(true);
+    try {
+      const r = await purgeUnverified(24);
+      toast({ title: `Removed ${r.removed} unverified account${r.removed === 1 ? "" : "s"}` });
+      load();
+    } catch (e) {
+      toast({ title: "Could not clean up", description: e.message, variant: "destructive" });
+    } finally { setPurging(false); }
+  };
 
   useEffect(() => { load(""); }, []);   // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -381,6 +401,24 @@ function UsersTab({ toast }) {
             {f.label}
           </Button>
         ))}
+      </div>
+
+      <div className="mb-3 flex flex-wrap items-center gap-3 text-sm">
+        <label className="inline-flex cursor-pointer items-center gap-2 text-muted-foreground">
+          <input type="checkbox" className="h-4 w-4 accent-primary" checked={hideUnverified}
+                 onChange={(e) => { setHideUnverified(e.target.checked);
+                                    load(q, plan, e.target.checked); }} />
+          Hide unverified
+        </label>
+        <span className="text-xs text-amber-400">{unverified} unverified in total</span>
+        {unverified > 0 ? (
+          <Button size="sm" variant="outline" onClick={purge} disabled={purging}>
+            {purging ? "Deleting…" : "Delete unverified (older than 24h)"}
+          </Button>
+        ) : null}
+        <span className="text-xs text-muted-foreground">
+          Unverified accounts older than 3 days are also removed automatically.
+        </span>
       </div>
 
       {rows === null ? <Loading /> : rows.length === 0 ? (

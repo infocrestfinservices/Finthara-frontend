@@ -66,6 +66,16 @@ export async function createCoupon(body) {
   return out;
 }
 
+/** Delete unverified sign-ups (bot residue) older than `hours`. Returns {removed}. */
+export async function purgeUnverified(hours = 24) {
+  const res = await fetch(`${BACKEND_URL}/admin/users/purge-unverified?hours=${hours}`, {
+    method: "POST", headers: authHeaders(),
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(out?.detail || `Could not clean up (${res.status})`);
+  return out;
+}
+
 export async function setCouponActive(id, active) {
   const res = await fetch(`${BACKEND_URL}/admin/coupons/${id}?active=${active}`, {
     method: "PATCH", headers: authHeaders(),
