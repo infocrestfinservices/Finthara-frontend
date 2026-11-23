@@ -240,7 +240,7 @@ export default function Admin() {
           {section === "coupons" ? <CouponsTab toast={toast} /> : null}
           {section === "roles" ? <RolesTab toast={toast} /> : null}
           {section === "blogs" ? <BlogsTab toast={toast} /> : null}
-          {section === "feedback" && user?.is_super_admin ? <FeedbackTab /> : null}
+          {section === "feedback" ? <FeedbackTab /> : null}
         </div>
       </main>
     </div>
@@ -264,8 +264,7 @@ const SECTIONS = [
     hint: "Who can get into this console" },
   { id: "blogs", label: "Blogs", icon: Newspaper,
     hint: "Write, edit and publish the posts on /blog" },
-  // Super admin only — hidden from other admins (and the API 404s for them).
-  { id: "feedback", label: "Feedback", icon: MessageSquareText, superOnly: true,
+  { id: "feedback", label: "Feedback", icon: MessageSquareText,
     hint: "Responses to the /feedback form" },
 ];
 

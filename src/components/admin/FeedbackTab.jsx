@@ -1,6 +1,6 @@
 /**
- * FeedbackTab.jsx — super admin only: every response to the /feedback form, newest first.
- * Reads GET /admin/feedback (which 404s for anyone who isn't the super admin).
+ * FeedbackTab.jsx — every response to the /feedback form, newest first (all admins).
+ * Reads GET /admin/feedback (which 404s for non-admins, like the rest of /admin).
  */
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";

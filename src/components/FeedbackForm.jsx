@@ -1,7 +1,7 @@
 /**
  * FeedbackForm.jsx — the 5-question feedback form on the /feedback page (signed-in only).
  *
- * Posts to POST /feedback with the user's token: saved in the database (super admin →
+ * Posts to POST /feedback with the user's token: saved in the database (admin panel →
  * Feedback tab) and emailed to the super admin. Name is required (prefilled from the
  * account); email is the account's own and cannot be edited. Questions 1–4 are
  * pick-an-option; question 5 is free text. The option lists must match feedback_router.py.

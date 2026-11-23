@@ -89,7 +89,6 @@ export const getDashboard = (days = 90) => get("/dashboard", { days });
 export const getAdminInvoices = (params) => get("/invoices", params);
 
 export const getRoles = () => get("/roles");
-// Super admin only (404 for other admins).
 export const getFeedback = (params) => get("/feedback", params);
 export const getRepeatBuyers = () => get("/repeat-buyers");
 
