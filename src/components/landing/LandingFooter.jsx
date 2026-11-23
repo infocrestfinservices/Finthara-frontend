@@ -1,11 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { MessageSquareText } from "lucide-react";
 import Logo from "@/components/Logo";
-import FeedbackForm from "@/components/FeedbackForm";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from "@/components/ui/dialog";
 
 // Official LinkedIn brand mark (blue rounded square, white "in").
 function LinkedInLogo({ className }) {
@@ -51,6 +46,7 @@ const COLUMNS = [
       { label: "My Reports", to: "/dashboard" },
       { label: "Dashboard", to: "/dashboard" },
       { label: "Contact", to: "/contact" },
+      { label: "Feedback", to: "/feedback" },
       { label: "Terms & Conditions", to: "/terms" },
       { label: "Privacy Policy", to: "/privacy" },
       { label: "Renewal & Cancellation", to: "/renewal-policy" },
@@ -59,7 +55,6 @@ const COLUMNS = [
 ];
 
 export default function LandingFooter() {
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
   // The "dark" class here scopes just this subtree to the dark palette in index.css
   // (its `.dark { --background: ...; }` overrides apply to ANY element carrying the
   // class, not only <html>) — so the footer band is always the dark theme, independent
@@ -109,14 +104,6 @@ export default function LandingFooter() {
         <div className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Infocrest Finweb Private Limited. All rights reserved.</p>
           <div className="flex items-center gap-3">
-            <a
-              href="/feedback"
-              onClick={(e) => { e.preventDefault(); setFeedbackOpen(true); }}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3.5 hover:text-foreground hover:border-foreground/40 transition-colors"
-            >
-              <MessageSquareText className="h-4 w-4" />
-              Feedback
-            </a>
             {SOCIAL.map(({ label, href, Icon }) => (
               <a
                 key={label}
@@ -133,16 +120,6 @@ export default function LandingFooter() {
           </div>
         </div>
       </div>
-
-      <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Share your feedback</DialogTitle>
-            <DialogDescription>Five quick questions — takes under a minute.</DialogDescription>
-          </DialogHeader>
-          <FeedbackForm key={feedbackOpen ? "open" : "closed"} onDone={() => setFeedbackOpen(false)} />
-        </DialogContent>
-      </Dialog>
     </footer>
   );
 }
