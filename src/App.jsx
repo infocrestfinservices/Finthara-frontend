@@ -15,6 +15,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import AcceptInvite from '@/pages/AcceptInvite';
 import Contact from '@/pages/Contact';
+import Feedback from '@/pages/Feedback';
 import BlogPage from '@/pages/Blog';
 import BlogPostPage from '@/pages/BlogPost';
 import Home from '@/pages/Home';
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/feedback" element={<Feedback />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
 

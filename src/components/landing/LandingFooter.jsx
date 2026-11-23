@@ -1,11 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Linkedin } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
 import Logo from "@/components/Logo";
+import FeedbackForm from "@/components/FeedbackForm";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+
+// Official LinkedIn brand mark (blue rounded square, white "in").
+function LinkedInLogo({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <rect width="24" height="24" rx="4" fill="#0A66C2" />
+      <rect x="4.6" y="9.5" width="2.5" height="9.5" fill="#fff" />
+      <circle cx="5.85" cy="6.95" r="1.45" fill="#fff" />
+      <path
+        fill="#fff"
+        d="M10.7 9.5h2.4v1.3h.04c.39-.74 1.34-1.52 2.76-1.52 2.95 0 3.5 1.94 3.5 4.47V19h-2.5v-4.6c0-1.1-.02-2.52-1.53-2.52-1.53 0-1.77 1.2-1.77 2.44V19h-2.5z"
+      />
+    </svg>
+  );
+}
 
 // Shown at the right of the footer's bottom bar. Add further profiles here as they go live.
 const SOCIAL = [
-  { label: "Finthara on LinkedIn", href: "https://www.linkedin.com/company/finthara/", Icon: Linkedin },
+  { label: "Finthara on LinkedIn", href: "https://www.linkedin.com/company/finthara/", Icon: LinkedInLogo },
 ];
 
 const COLUMNS = [
@@ -40,6 +59,7 @@ const COLUMNS = [
 ];
 
 export default function LandingFooter() {
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   // The "dark" class here scopes just this subtree to the dark palette in index.css
   // (its `.dark { --background: ...; }` overrides apply to ANY element carrying the
   // class, not only <html>) — so the footer band is always the dark theme, independent
@@ -57,9 +77,6 @@ export default function LandingFooter() {
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
               AI-powered feasibility studies and project reports — bank, scheme, and investor-ready
               in minutes, for Indian and global entrepreneurs.
-            </p>
-            <p className="mt-4 text-sm font-medium text-foreground max-w-xs leading-relaxed">
-              Product by Infocresst
             </p>
           </div>
 
@@ -92,6 +109,14 @@ export default function LandingFooter() {
         <div className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} Infocrest Finweb Private Limited. All rights reserved.</p>
           <div className="flex items-center gap-3">
+            <a
+              href="/feedback"
+              onClick={(e) => { e.preventDefault(); setFeedbackOpen(true); }}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3.5 hover:text-foreground hover:border-foreground/40 transition-colors"
+            >
+              <MessageSquareText className="h-4 w-4" />
+              Feedback
+            </a>
             {SOCIAL.map(({ label, href, Icon }) => (
               <a
                 key={label}
@@ -100,14 +125,24 @@ export default function LandingFooter() {
                 rel="noopener noreferrer"
                 aria-label={label}
                 title={label}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border hover:text-foreground hover:border-foreground/40 transition-colors"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:opacity-85 transition-opacity"
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-7 w-7" />
               </a>
             ))}
           </div>
         </div>
       </div>
+
+      <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Share your feedback</DialogTitle>
+            <DialogDescription>Five quick questions — takes under a minute.</DialogDescription>
+          </DialogHeader>
+          <FeedbackForm key={feedbackOpen ? "open" : "closed"} onDone={() => setFeedbackOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }
