@@ -1,9 +1,9 @@
 /**
- * FeedbackForm.jsx — the 5-question feedback form. Shown in two places:
- *   - a popup from the footer's "Feedback" button (LandingFooter.jsx)
- *   - the shareable /feedback page (pages/Feedback.jsx)
+ * FeedbackForm.jsx — the 5-question feedback form on the /feedback page (signed-in only).
  *
- * Posts to POST /feedback, which emails the response to the super admin. Questions 1–4 are
+ * Posts to POST /feedback with the user's token: saved in the database (super admin →
+ * Feedback tab) and emailed to the super admin. Name is required (prefilled from the
+ * account); email is the account's own and cannot be edited. Questions 1–4 are
  * pick-an-option; question 5 is free text. The option lists must match feedback_router.py.
  */
 import React, { useState } from "react";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Star, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -57,28 +58,32 @@ function Pill({ selected, onClick, children }) {
 
 export default function FeedbackForm({ onDone }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     rating: 0, purpose: "", quality: "", recommend: "",
-    message: "", name: "", email: "", company: "",
+    message: "", name: user?.full_name || "",
   });
   const [hover, setHover] = useState(0);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const complete = form.rating && form.purpose && form.quality && form.recommend;
+  const complete = form.rating && form.purpose && form.quality && form.recommend && form.name.trim();
 
   const submit = async (e) => {
     e.preventDefault();
     if (!complete) {
-      toast({ title: "Please answer questions 1–4", variant: "destructive" });
+      toast({ title: "Please answer questions 1–4 and enter your name", variant: "destructive" });
       return;
     }
     setBusy(true);
     try {
       const res = await fetch(`${BACKEND_URL}/feedback`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("rc_auth_token") || ""}`,
+        },
         body: JSON.stringify(form),
       });
       const data = await res.json().catch(() => ({}));
@@ -157,23 +162,15 @@ export default function FeedbackForm({ onDone }) {
 
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="fb-name" className="text-xs text-muted-foreground">Name (optional)</Label>
-          <Input id="fb-name" value={form.name} onChange={(e) => set("name", e.target.value)} />
+          <Label htmlFor="fb-name" className="text-sm font-medium">Name</Label>
+          <Input id="fb-name" value={form.name} required
+                 onChange={(e) => set("name", e.target.value)} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="fb-email" className="text-xs text-muted-foreground">Email (optional)</Label>
-          <Input id="fb-email" type="email" value={form.email}
-                 onChange={(e) => set("email", e.target.value)} />
+          <Label htmlFor="fb-email" className="text-sm font-medium">Email</Label>
+          <Input id="fb-email" type="email" value={user?.email || ""} disabled readOnly />
         </div>
       </div>
-
-      {/* Honeypot — hidden from real users, catches bots. */}
-      <input
-        type="text" tabIndex={-1} autoComplete="off" value={form.company}
-        onChange={(e) => set("company", e.target.value)}
-        style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }}
-        aria-hidden="true"
-      />
 
       <Button type="submit" disabled={busy || !complete} className="w-full gap-1.5">
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

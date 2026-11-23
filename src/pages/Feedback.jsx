@@ -1,14 +1,20 @@
 /**
  * Feedback.jsx — shareable /feedback page, linked from the footer's Company column (same
  * layout as Terms & Conditions). "Copy link" puts this page's address on the clipboard.
+ *
+ * Sign-in required: a visitor who is not logged in is sent to /login?next=/feedback and
+ * lands back here after logging in.
  */
 import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import { LandingNavbar, LandingFooter } from "@/components/landing";
 import FeedbackForm from "@/components/FeedbackForm";
 import { Button } from "@/components/ui/button";
 import { Link2, Check } from "lucide-react";
 
 export default function Feedback() {
+  const { isAuthenticated } = useAuth();
   const [copied, setCopied] = useState(false);
   const link = `${window.location.origin}/feedback`;
 
@@ -21,6 +27,8 @@ export default function Feedback() {
       window.prompt("Copy this link:", link);
     }
   };
+
+  if (!isAuthenticated) return <Navigate to="/login?next=/feedback" replace />;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

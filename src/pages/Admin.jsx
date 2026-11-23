@@ -26,11 +26,12 @@ import {
 import {
   Users, CreditCard, FileText, ArrowLeft, Loader2, AlertCircle, Search, Tag, Plus,
   LayoutDashboard, Crown, LogOut, RefreshCw, ShieldCheck, Repeat, Receipt,
-  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Newspaper,
+  ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Newspaper, MessageSquareText,
 } from "lucide-react";
 import DashboardTab from "@/components/admin/DashboardTab";
 import RolesTab from "@/components/admin/RolesTab";
 import BlogsTab from "@/components/admin/BlogsTab";
+import FeedbackTab from "@/components/admin/FeedbackTab";
 import {
   getStats, getIndustries, getUsers, getPayments, getProjects, setUserPlan,
   getCoupons, createCoupon, setCouponActive, getRepeatBuyers, getAdminInvoices,
@@ -239,6 +240,7 @@ export default function Admin() {
           {section === "coupons" ? <CouponsTab toast={toast} /> : null}
           {section === "roles" ? <RolesTab toast={toast} /> : null}
           {section === "blogs" ? <BlogsTab toast={toast} /> : null}
+          {section === "feedback" && user?.is_super_admin ? <FeedbackTab /> : null}
         </div>
       </main>
     </div>
@@ -262,7 +264,12 @@ const SECTIONS = [
     hint: "Who can get into this console" },
   { id: "blogs", label: "Blogs", icon: Newspaper,
     hint: "Write, edit and publish the posts on /blog" },
+  // Super admin only — hidden from other admins (and the API 404s for them).
+  { id: "feedback", label: "Feedback", icon: MessageSquareText, superOnly: true,
+    hint: "Responses to the /feedback form" },
 ];
+
+const visibleSections = (user) => SECTIONS.filter((x) => !x.superOnly || user?.is_super_admin);
 
 function Sidebar({ section, onSelect, onLogout }) {
   const { user } = useAuth();
@@ -284,7 +291,7 @@ function Sidebar({ section, onSelect, onLogout }) {
         <p className="px-2 pb-2 text-[10px] uppercase tracking-wider text-muted-foreground">
           Management
         </p>
-        {SECTIONS.map((x) => {
+        {visibleSections(user).map((x) => {
           const Icon = x.icon;
           const active = section === x.id;
           return (
@@ -317,9 +324,10 @@ function Sidebar({ section, onSelect, onLogout }) {
 /* The tab strip is gone; on a narrow screen the sidebar is hidden, so this is how the
    sections stay reachable there. */
 function MobileNav({ section, onSelect }) {
+  const { user } = useAuth();
   return (
     <div className="flex gap-2 overflow-x-auto border-b border-border p-3 md:hidden">
-      {SECTIONS.map((x) => (
+      {visibleSections(user).map((x) => (
         <button key={x.id} onClick={() => onSelect(x.id)}
                 className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm ${
                   section === x.id ? "bg-primary/15 text-primary" : "text-muted-foreground"}`}>
