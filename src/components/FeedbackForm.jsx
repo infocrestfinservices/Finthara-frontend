@@ -146,12 +146,12 @@ export default function FeedbackForm({ onDone }) {
 
       <div className="space-y-2">
         <Label htmlFor="fb-message" className="text-sm font-medium">
-          5. Your thoughts — anything you'd like to tell us
+          5. What would you like us to improve?
         </Label>
         <Textarea
           id="fb-message" rows={4} value={form.message}
           onChange={(e) => set("message", e.target.value)}
-          placeholder="Suggestions, problems you faced, features you'd like…"
+          placeholder="Tell us what we can do better…"
         />
       </div>
 
