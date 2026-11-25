@@ -35,7 +35,7 @@ const STEPS = [
     icon: LineChart,
     title: "Review your live report",
     time: "Instant",
-    desc: "Your report renders instantly with interactive charts and formatted tables, structured to the exact CMA / SBA / scheme layout your institution expects.",
+    desc: "Your report renders instantly with interactive charts and formatted tables, structured to the exact CMA layout Indian banks expect.",
     chips: ["Interactive charts", "Bank-spec layout", "Edit & regenerate"],
   },
   {
@@ -50,7 +50,7 @@ const STEPS = [
 // ── Behind the scenes ────────────────────────────────────────────────────────
 const ENGINE = [
   { icon: Brain, title: "Understands your industry", desc: "Recognises your sector and pulls the right cost structure and assumptions." },
-  { icon: Globe2, title: "Detects the right format", desc: "Maps your country and loan type to CMA, SBA, PMEGP, Innovate UK and more." },
+  { icon: Globe2, title: "Detects the right format", desc: "Picks the right format for your need — CMA Data, Feasibility Study or Short Project Report." },
   { icon: Calculator, title: "Runs the financial model", desc: "Builds a 5-year P&L, cash flow and ratio analysis automatically." },
   { icon: TableProperties, title: "Renders charts & tables", desc: "Turns the numbers into interactive graphs and lender-ready tables." },
   { icon: ShieldCheck, title: "Checks the key ratios", desc: "Validates DSCR, Current Ratio, IRR and Payback against benchmarks." },

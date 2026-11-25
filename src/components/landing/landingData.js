@@ -5,7 +5,7 @@ import {
 
 export const FEATURES = [
   { icon: Sparkles, title: "AI-Powered Interviews", desc: "Conversational AI asks the right questions to extract all project details — no forms to fill.", color: "text-teal-600", bg: "bg-teal-50" },
-  { icon: Globe2, title: "Country-Specific Formats", desc: "CMA Data for India, SBA format for USA, Innovate UK grants, and more — auto-detected.", color: "text-blue-500", bg: "bg-blue-50" },
+  { icon: Globe2, title: "Built for Indian Banks", desc: "CMA Data for bank loans, Feasibility Study and Short Project Report — in the structure Indian banks expect.", color: "text-blue-500", bg: "bg-blue-50" },
   { icon: BarChart3, title: "Live Financial Charts", desc: "P&L, revenue projections, and cost breakdowns rendered as interactive graphs inside the report.", color: "text-emerald-500", bg: "bg-emerald-50" },
   { icon: Download, title: "Export Everywhere", desc: "Download as polished PDF, formatted Word doc, or editable Excel — ready to submit.", color: "text-amber-500", bg: "bg-amber-50" },
   { icon: Shield, title: "Bank & Investor Ready", desc: "DSCR, Current Ratio, IRR, Payback Period, MOIC — every metric lenders and investors need.", color: "text-rose-500", bg: "bg-rose-50" },
@@ -14,9 +14,9 @@ export const FEATURES = [
 
 // Bank / scheme / report formats the AI can produce — used in the marquee strip.
 export const FORMATS = [
-  "CMA Data", "SBI", "SBA (USA)", "Mudra Loan", "PMEGP", "CGTMSE",
-  "DSCR Analysis", "Innovate UK", "VC Term Sheet", "PE Diligence",
-  "Feasibility Study", "IRR / MOIC",
+  "CMA Data", "Bank Loan Report", "Feasibility Study", "Short Project Report",
+  "DSCR Analysis", "Projected P&L", "Balance Sheet", "Cash Flow",
+  "Current Ratio", "IRR / MOIC", "Payback Period",
 ];
 
 // What the generated report actually contains — the deliverables.
@@ -24,7 +24,7 @@ export const REPORT_INCLUDES = [
   { icon: Calculator, title: "5-Year Financial Model", desc: "Projected P&L, balance sheet and cash flow — with editable assumptions before you export." },
   { icon: ShieldCheck, title: "Lender-Grade Ratios", desc: "DSCR, Current Ratio, IRR, Payback Period and MOIC, benchmarked against what banks expect." },
   { icon: BarChart3, title: "Charts & Data Tables", desc: "Revenue projections, cost breakdowns and ratio tables rendered as presentation-ready visuals." },
-  { icon: Globe2, title: "Bank & Scheme Formats", desc: "CMA Data, SBA, Mudra, PMEGP, CGTMSE and Innovate UK — the exact structure each authority needs." },
+  { icon: Globe2, title: "Bank-Ready Formats", desc: "CMA Data for bank loans, Feasibility Study and Short Project Report — in the structure Indian banks expect." },
   { icon: FileText, title: "Full Narrative Sections", desc: "Executive summary, market analysis, SWOT, promoter profile and risk assessment — all written for you." },
   { icon: Download, title: "PDF · Word · Excel Export", desc: "Download a polished PDF, an editable Word doc, or live Excel financials — submission-ready." },
 ];
@@ -32,7 +32,7 @@ export const REPORT_INCLUDES = [
 export const STEPS = [
   { step: "01", title: "Describe your project", desc: "Type your business idea in plain English. The AI understands every industry and region.", icon: Zap },
   { step: "02", title: "AI interviews you", desc: "It asks smart follow-up questions — costs, location, bank format, investor type. One question at a time.", icon: Sparkles },
-  { step: "03", title: "Download your report", desc: "Get a fully formatted CMA / SBA / investor-grade report in PDF, Word, or Excel in minutes.", icon: Download },
+  { step: "03", title: "Download your report", desc: "Get a fully formatted CMA, feasibility or short project report in PDF, Word, or Excel in minutes.", icon: Download },
 ];
 
 // `id` is the server's plan key (services/entitlements.py). The price shown here is only for
